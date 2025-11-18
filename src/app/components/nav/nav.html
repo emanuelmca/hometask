@@ -1,0 +1,22 @@
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo">HomeTask</div>
+  </div>
+
+  <div class="nav-links" [class.open]="menuOpen">
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/members" routerLinkActive="active">Miembros</a>
+    <a routerLink="/tasks" routerLinkActive="active">Tareas</a>
+    <a routerLink="/events" routerLinkActive="active">Eventos</a>
+    <a routerLink="/hogares" routerLinkActive="active">Hogares</a>
+  </div>
+
+  <div class="nav-right">
+    <span class="user">Admin</span>
+    <button class="logout-btn" (click)="logout()">Salir</button>
+
+    <div class="hamburger" (click)="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>

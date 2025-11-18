@@ -1,0 +1,58 @@
+<app-nav></app-nav>
+
+<div class="members-container container mt-4">
+
+  <h2 class="text-center mb-4">Lista de Miembros</h2>
+
+  <!-- Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center mt-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <!-- Listado -->
+  <div class="row" *ngIf="!loading">
+    <div class="col-md-4 mb-4" *ngFor="let m of miembros">
+      <div class="card member-card shadow-sm">
+
+        <div class="card-body">
+          <h5 class="card-title">
+            {{ m.nombre_completo }}
+            <span class="badge ms-2"
+              [ngClass]="m.estado ? 'bg-success' : 'bg-secondary'">
+              {{ m.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </h5>
+
+          <p class="text-muted mb-1">
+            📧 {{ m.correo_electronico }}
+          </p>
+
+          <p class="mb-1">
+            🏷 Rol: <strong>{{ m.rol.nombre }}</strong>
+          </p>
+
+          <p class="small text-muted">
+            Hogar #{{ m.id_hogar }}
+          </p>
+
+          <p class="text-muted small">
+            Creado: {{ m.fecha_creacion | date:'short' }}
+          </p>
+
+          <!-- BOTÓN EDITAR -->
+          <button class="btn btn-primary btn-sm mt-2" (click)="editarNombre(m)">
+            ✏️ Editar nombre
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

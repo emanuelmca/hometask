@@ -1,0 +1,220 @@
+
+
+/* Mensajes */
+.msg-box {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  background: #dbeafe;
+  color: #1e3a8a;
+  border: 1px solid #93c5fd;
+  animation: fadeIn .3s ease-in-out;
+}
+
+/* ==== CONTENEDOR === */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px; 
+  background: linear-gradient(135deg, #4a90e2 0%, #6dd5fa 50%, #ffffff 100%);
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+}
+
+/* TARJETA */
+.register-card {
+  background: rgba(255, 255, 255, 0.90);
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.18);
+  backdrop-filter: blur(8px);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+}
+
+
+
+/* === ICONO DE HOGAR === */
+.icon-wrapper {
+  width: 70px;
+  height: 70px;
+  backdrop-filter: blur(6px);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 8px 16px rgba(59,130,246,0.4);
+}
+
+.home-icon {
+  width: 42px;
+  height: 42px;
+}
+
+/* TITULOS */
+.register-card h2 {
+  margin: 8px 0;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.subtitle {
+  color: #4b5563;
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+/* INPUTS */
+.form-group {
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  /*negrita*/
+  font-style: Bold;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 5px 14px;
+  border-radius: 12px;
+  border: 1px solid #dce6f5;
+  background: #f9fbff;
+  transition: all 0.25s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59,130,246,0.3);
+  outline: none;
+}
+
+/* BOTÓN */
+.btn-register {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.25s;
+}
+
+.btn-register:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(37,99,235,0.35);
+}
+
+/* Link Login */
+.login-link {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #2563eb;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* ===============================
+   📱 RESPONSIVE
+================================ */
+
+/* Tablets (<= 992px) */
+@media (max-width: 992px) {
+  .register-card {
+    max-width: 420px;
+    padding: 35px 28px;
+  }
+
+  .register-card h2 {
+    font-size: 24px;
+  }
+}
+
+/* Celulares medianos (<= 768px) */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 16px;
+  }
+
+  .register-card {
+    max-width: 380px;
+    padding: 32px 24px;
+  }
+
+  .home-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  input, select {
+    padding: 11px;
+  }
+}
+
+/* Celulares pequeños (<= 480px) */
+@media (max-width: 480px) {
+  .register-card {
+    max-width: 100%;
+    padding: 28px 20px;
+    border-radius: 16px;
+  }
+
+  .icon-wrapper {
+    width: 68px;
+    height: 68px;
+  }
+
+  .home-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .register-card h2 {
+    font-size: 22px;
+  }
+
+  .btn-register {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .login-link {
+    font-size: 13px;
+  }
+}
+
+/* Celulares muy pequeños (<= 360px) */
+@media (max-width: 360px) {
+  .register-card {
+    padding: 24px 16px;
+  }
+
+  input, select {
+    font-size: 14px;
+  }
+
+  .btn-register {
+    font-size: 14px;
+  }
+}

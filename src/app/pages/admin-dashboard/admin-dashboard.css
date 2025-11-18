@@ -1,0 +1,98 @@
+.dashboard-wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* -------- SIDEBAR IZQUIERDO -------- */
+.sidebar-left {
+  width: 260px;
+  position: sticky;
+  top: 90px;
+  height: calc(100vh - 110px);
+}
+
+.sidebar-tareas {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.button-group {
+  margin-top: auto;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* -------- GRID PRINCIPAL -------- */
+.dashboard-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 180px;
+  gap: 20px;
+}
+
+/* CALENDARIO 4x4 */
+.calendar-large {
+  grid-column: span 3;
+  grid-row: span 3;
+}
+
+/* BENTO ITEM BASE */
+.bento-item {
+  padding: 20px;
+  border-radius: 18px;
+  background: #fff;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* GRADIENTES */
+.gradient-1 { background: linear-gradient(135deg, #6EE7B7, #3B82F6); color: white; }
+.gradient-2 { background: linear-gradient(135deg, #F59E0B, #EF4444); color: white; }
+.gradient-3 { background: linear-gradient(135deg, #8B5CF6, #EC4899); color: white; }
+.gradient-4 { background: linear-gradient(135deg, #06B6D4, #3B82F6); color: white; }
+.gradient-5 { background: linear-gradient(135deg, #10B981, #059669); color: white; }
+.gradient-6 { background: linear-gradient(135deg, #0EA5E9, #6366F1); color: white; }
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .dashboard-wrapper {
+    flex-direction: column;
+  }
+
+  .sidebar-left {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .calendar-large {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+.event-list {
+  margin-top: 10px;
+  padding-left: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.event-list li {
+  margin-bottom: 6px;
+  line-height: 1.3;
+}

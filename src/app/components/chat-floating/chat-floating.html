@@ -1,0 +1,22 @@
+<!-- Botón flotante -->
+<button class="chat-float-btn" (click)="toggleChat()">
+  💬
+</button>
+
+<!-- Ventana de chat -->
+<div class="chat-box" *ngIf="isOpen">
+  <div class="chat-header">
+    <span>Chat</span>
+    <button class="close-btn" (click)="toggleChat()">✖</button>
+  </div>
+
+  <div class="chat-body">
+    <div class="msg other">Hola 👋</div>
+    <div class="msg me">¿En qué te ayudo?</div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" placeholder="Escribe un mensaje...">
+    <button>Enviar</button>
+  </div>
+</div>

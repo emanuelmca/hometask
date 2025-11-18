@@ -1,0 +1,36 @@
+<div class="calendar-container">
+
+  <div class="calendar-header">
+    <button mat-icon-button (click)="prevMonth()">
+      ‹
+    </button>
+
+    <h3>{{ monthName }} {{ year }}</h3>
+
+    <button mat-icon-button (click)="nextMonth()">
+      ›
+    </button>
+  </div>
+
+  <!-- Encabezado -->
+  <div class="calendar-grid">
+    <div class="day-name" *ngFor="let d of dayNames">{{ d }}</div>
+
+    <!-- Celdas del calendario -->
+    <div 
+      class="day-cell"
+      *ngFor="let day of calendarDays"
+      [class.empty]="day === null"
+    >
+
+      <div *ngIf="day" class="day-number">{{ day }}</div>
+
+      <!-- EVENTOS -->
+      <div class="event-dot" *ngFor="let ev of eventosDelDia(day)">
+        {{ ev.titulo }}
+      </div>
+
+    </div>
+  </div>
+
+</div>
