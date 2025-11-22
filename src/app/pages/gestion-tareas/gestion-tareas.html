@@ -26,29 +26,25 @@
             <button 
               class="btn-filter" 
               [class.active]="filtroEstado === 'todas'"
-              (click)="filtrarTareas('todas')"
-            >
+              (click)="filtrarTareas('todas')">
               Todas ({{ tareas.length }})
             </button>
             <button 
               class="btn-filter" 
               [class.active]="filtroEstado === 'pendiente'"
-              (click)="filtrarTareas('pendiente')"
-            >
+              (click)="filtrarTareas('pendiente')">
               Pendientes ({{ contarTareasPorEstado('pendiente') }})
             </button>
             <button 
               class="btn-filter" 
               [class.active]="filtroEstado === 'en_progreso'"
-              (click)="filtrarTareas('en_progreso')"
-            >
+              (click)="filtrarTareas('en_progreso')">
               En Progreso ({{ contarTareasPorEstado('en_progreso') }})
             </button>
             <button 
               class="btn-filter" 
               [class.active]="filtroEstado === 'completada'"
-              (click)="filtrarTareas('completada')"
-            >
+              (click)="filtrarTareas('completada')">
               Completadas ({{ contarTareasPorEstado('completada') }})
             </button>
           </div>
@@ -80,7 +76,7 @@
 
     <!-- LISTA DE TAREAS -->
     <div class="tasks-list" *ngIf="!loading && tareasFiltradas.length > 0">
-      <div class="task-card" *ngFor="let tarea of tareasFiltradas" [class]="'estado-' + tarea.estado_actual">
+      <div class="task-card clickable" *ngFor="let tarea of tareasFiltradas" [class]="'estado-' + tarea.estado_actual" (click)="navegarADetalle(tarea.id)">
         
         <!-- HEADER DE LA TAREA -->
         <div class="task-header">
@@ -91,10 +87,10 @@
             </span>
           </div>
           <div class="task-actions">
-            <button class="btn-action" (click)="editarTarea(tarea)" title="Editar">
+            <button class="btn-action" (click)="editarTarea(tarea); $event.stopPropagation()" title="Editar">
               ✏️
             </button>
-            <button class="btn-action" (click)="cambiarEstadoTarea(tarea)" title="Cambiar estado">
+            <button class="btn-action" (click)="cambiarEstadoTarea(tarea); $event.stopPropagation()" title="Cambiar estado">
               🔄
             </button>
           </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { CommonModule } from '@angular/common';
+import { ChatFloatingComponent } from "../../components/chat-floating/chat-floating";
 
 
 interface Task {
@@ -26,7 +27,7 @@ interface ShoppingItem {
 
 @Component({
   selector: 'app-member-dashboard',
-  imports: [NavMiembroComponent,CommonModule],
+  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent],
   templateUrl: './dash-miembro.html',
   styleUrls: ['./dash-miembro.css']
 })

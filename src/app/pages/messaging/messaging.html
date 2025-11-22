@@ -1,0 +1,104 @@
+<div class="messaging-container">
+  
+  <!-- HEADER -->
+  <div class="messaging-header">
+    <button class="btn-back" (click)="volver()">
+      ←
+    </button>
+    <div class="contact-info" *ngIf="miembro">
+      <div class="contact-avatar">
+        {{ miembro.nombre_completo.charAt(0).toUpperCase() }}
+      </div>
+      <div class="contact-details">
+        <div class="contact-name">{{ miembro.nombre_completo }}</div>
+        <div class="contact-status">En línea</div>
+      </div>
+    </div>
+    <button class="btn-menu">
+      ⋮
+    </button>
+  </div>
+
+  <!-- MENSAJES -->
+  <div class="messages-container" #messagesContainer>
+    
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-messages">
+      <div class="spinner-border"></div>
+      <p>Cargando mensajes...</p>
+    </div>
+
+    <!-- LISTA DE MENSAJES -->
+    <div *ngIf="!loading" class="messages-list">
+      <div *ngFor="let mensaje of messages" 
+           class="message-wrapper"
+           [class.message-own]="esMensajePropio(mensaje)"
+           [class.message-other]="!esMensajePropio(mensaje)">
+        
+        <!-- Avatar (solo para mensajes del otro) -->
+    </div>
+  </div>
+
+  <!-- INPUT DE MENSAJE -->
+  <div class="message-input-container">
+    
+    <!-- Preview de imagen -->
+    <div *ngIf="imagenPreview" class="image-preview-container">
+      <div class="image-preview">
+        <img [src]="imagenPreview" alt="Preview">
+        <button class="btn-remove-preview" (click)="eliminarImagenPreview()">×</button>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-row">
+      <input 
+        type="file" 
+        #fileInput 
+        accept="image/*" 
+        (change)="onImagenSeleccionada($event)"
+        style="display: none;"
+      >
+      <button class="btn-add" (click)="fileInput.click()" title="Adjuntar imagen">
+        +
+      </button>
+      <input 
+        type="text" 
+        class="text-input"
+        [(ngModel)]="nuevoMensaje"
+        placeholder="Escribe un mensaje..."
+        (keypress)="$event.key === 'Enter' && enviarMensaje()"
+        [disabled]="enviandoMensaje"
+      >
+      <button 
+        class="btn-send" 
+        (click)="enviarMensaje()"
+        [disabled]="enviandoMensaje || (!nuevoMensaje.trim() && !imagenSeleccionada)"
+      >
+        <span *ngIf="!enviandoMensaje">➤</span>
+        <span *ngIf="enviandoMensaje" class="spinner-small"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAVIGATION -->
+  <div class="bottom-nav">
+    <button class="nav-item" (click)="navegarA('/dashboard')">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Panel</span>
+    </button>
+    <button class="nav-item" (click)="navegarA('/dashboard')">
+      <span class="nav-icon">✓</span>
+      <span class="nav-label">Tareas</span>
+    </button>
+    <button class="nav-item" (click)="navegarA('/dashboard')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Calendario</span>
+    </button>
+    <button class="nav-item active">
+      <span class="nav-icon">👥</span>
+      <span class="nav-label">Miembros</span>
+    </button>
+  </div>
+
+</div>

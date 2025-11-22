@@ -1,0 +1,174 @@
+<app-nav></app-nav>
+
+<div class="reports-container">
+  <div class="reports-header">
+    <h1>Reportes y Estadísticas</h1>
+    <p>Análisis de actividad y rendimiento del hogar</p>
+  </div>
+
+  <div class="reports-grid">
+    
+    <!-- Activity Chart -->
+    <div class="report-card activity-card">
+      <div class="card-header">
+        <h3>Activity</h3>
+        <div class="time-selector">
+          <span class="calendar-icon">📅</span>
+          <span>Last 7 days</span>
+        </div>
+      </div>
+      <div class="activity-stats">
+        <div class="stat-value">{{ averageActivityHours }}</div>
+        <div class="stat-label">Hours<br>spent</div>
+      </div>
+      <div class="chart-container">
+        <div class="bar-chart">
+          <div *ngFor="let data of activityData" class="bar-wrapper">
+            <div class="bar" 
+                 [style.height.%]="getActivityBarHeight(data.hours)"
+                 [class.highlighted]="data.day === 'Fri'">
+              <div class="bar-label" *ngIf="data.day === 'Fri'">{{ data.hours }} hours</div>
+            </div>
+            <div class="bar-day">{{ data.day }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Received Statistics -->
+    <div class="report-card received-card">
+      <div class="card-header">
+        <h3>Received</h3>
+        <button class="menu-btn">⋮</button>
+      </div>
+      <div class="card-subtitle">Last 30 days</div>
+      <div class="chart-container">
+        <div class="bar-chart horizontal">
+          <div *ngFor="let data of receivedData" class="bar-wrapper">
+            <div class="bar" [style.height.%]="getReceivedBarHeight(data.count)"></div>
+            <div class="bar-label">{{ data.date }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Statistics -->
+    <div class="report-card progress-card">
+      <div class="card-header">
+        <h3>Progress statistics</h3>
+        <button class="menu-btn">⋮</button>
+      </div>
+      <div class="progress-content">
+        <div class="progress-circle">
+          <svg viewBox="0 0 200 200" class="circular-chart">
+            <circle class="circle-bg" cx="100" cy="100" r="80"></circle>
+            <circle class="circle-progress" 
+                    cx="100" cy="100" r="80"
+                    [style.stroke-dasharray]="progressStats.percentage * 5.024 + ' 502.4'"></circle>
+          </svg>
+          <div class="progress-text">
+            <div class="progress-percentage">{{ progressStats.percentage }}%</div>
+            <div class="progress-label">Total<br>activity</div>
+          </div>
+        </div>
+        <div class="progress-bars">
+          <div class="progress-bar-item">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="24"></div>
+            </div>
+            <div class="progress-range">24% — 75%</div>
+          </div>
+        </div>
+        <div class="progress-stats-grid">
+          <div class="stat-box">
+            <div class="stat-icon">⏱</div>
+            <div class="stat-number">{{ progressStats.inProgress }}</div>
+            <div class="stat-text">In progress</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-icon">✓</div>
+            <div class="stat-number">{{ progressStats.completed }}</div>
+            <div class="stat-text">Completed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Breakdown -->
+    <div class="report-card category-card">
+      <div class="card-header">
+        <h3>By platform</h3>
+      </div>
+      <div class="category-list">
+        <div *ngFor="let category of categoryData" class="category-item">
+          <div class="category-icon">{{ category.icon }}</div>
+          <div class="category-info">
+            <div class="category-name">{{ category.name }}</div>
+            <div class="category-tasks">{{ category.tasks }} lessons</div>
+          </div>
+          <div class="category-hours">{{ category.hours }} h</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Performance Report -->
+    <div class="report-card completion-card">
+      <div class="card-header">
+        <h3>Rendimiento de Usuarios Mensual</h3>
+        <select class="time-selector-dropdown">
+          <option>Last 30 days</option>
+          <option>Last 60 days</option>
+          <option>Last 90 days</option>
+        </select>
+      </div>
+      <div class="chart-container large">
+        <svg viewBox="0 0 600 200" class="line-chart">
+          <defs>
+            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+              <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.05" />
+            </linearGradient>
+          </defs>
+          <path [attr.d]="getUserPerformanceAreaPath()" fill="url(#areaGradient)"></path>
+          <path [attr.d]="getUserPerformancePath()" 
+                fill="none" 
+                stroke="#8b5cf6" 
+                stroke-width="3"></path>
+        </svg>
+      </div>
+      <div class="revenue-stats">
+        <div class="revenue-item">
+          <div class="revenue-value">{{ monthlyTasksCompleted }}</div>
+          <div class="revenue-growth positive">{{ monthlyGrowth }}</div>
+          <div class="revenue-label">Tareas Completadas (Mes)</div>
+        </div>
+        <div class="revenue-item">
+          <div class="revenue-value">{{ averageTasksPerUser }}</div>
+          <div class="revenue-growth positive">{{ userGrowth }}</div>
+          <div class="revenue-label">Promedio por Usuario</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- External Reports Iframe -->
+    <div class="report-card iframe-card">
+      <div class="card-header">
+        <h3>External Reports</h3>
+        <button class="menu-btn">⋮</button>
+      </div>
+      <div class="iframe-container">
+        <iframe 
+          title="pwbi" 
+          width="100%" 
+          height="100%" 
+          src="https://app.powerbi.com/view?r=eyJrIjoiOThmZWIyOTItYTg0Zi00NTgzLThmN2YtMDUxZGY3MGRjNDI4IiwidCI6IjFlOWFhYmU4LTY3ZjgtNGYxYy1hMzI5LWE3NTRlOTI0OTlhZSIsImMiOjR9" 
+          frameborder="0" 
+          allowFullScreen="true">
+        </iframe>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-chat-floating></app-chat-floating>

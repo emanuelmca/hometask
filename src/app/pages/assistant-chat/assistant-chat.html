@@ -1,0 +1,84 @@
+<div class="assistant-container">
+  <!-- Header -->
+  <div class="assistant-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-chevron-left">‹</i>
+    </button>
+    <div class="header-info">
+      <h1>Asistente</h1>
+      <span class="status">En línea</span>
+    </div>
+    <button class="menu-btn">⋮</button>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area" #scrollContainer>
+    <div class="messages-list">
+      
+      <ng-container *ngFor="let msg of messages">
+        
+        <!-- Bubble -->
+        <div *ngIf="msg.type === 'bubble'" 
+             class="message-bubble" 
+             [ngClass]="{'assistant': msg.from === 'assistant', 'user': msg.from === 'user'}">
+          <div class="avatar" *ngIf="msg.from === 'assistant'">
+            <span>✨</span>
+          </div>
+          <div class="bubble-content">
+            {{ msg.content }}
+          </div>
+        </div>
+
+        <!-- Bullets -->
+        <div *ngIf="msg.type === 'bullets'" class="message-bullets assistant">
+          <div class="avatar-spacer"></div>
+          <div class="bullets-content">
+            <ul>
+              <li *ngFor="let bullet of msg.content">{{ bullet }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div *ngIf="msg.type === 'actions'" class="message-actions assistant">
+          <div class="avatar-spacer"></div>
+          <div class="actions-chips">
+            <button *ngFor="let action of msg.content" 
+                    class="action-chip" 
+                    (click)="handleAction(action)">
+              {{ action.label }}
+            </button>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="loading" class="message-bubble assistant loading">
+        <div class="avatar">
+          <span>✨</span>
+        </div>
+        <div class="bubble-content">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <input 
+      type="text" 
+      [(ngModel)]="newMessage" 
+      (keyup.enter)="sendMessage()"
+      placeholder="Escribe un mensaje..."
+      [disabled]="loading"
+    >
+    <button class="send-btn" (click)="sendMessage()" [disabled]="!newMessage.trim() || loading">
+      ➤
+    </button>
+  </div>
+</div>

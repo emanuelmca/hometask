@@ -1,6 +1,6 @@
-<!-- Botón flotante -->
+﻿<!-- Bot├│n flotante -->
 <button class="chat-float-btn" (click)="toggleChat()">
-  💬
+  ­ƒÆ¼
   <span class="notification-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
 </button>
 
@@ -28,9 +28,9 @@
         (click)="volverALista()"
         title="Volver a contactos"
       >
-        ‹
+        ÔÇ╣
       </button>
-      <button class="close-btn" (click)="toggleChat()">✖</button>
+      <button class="close-btn" (click)="toggleChat()">Ô£û</button>
     </div>
   </div>
 
@@ -73,7 +73,7 @@
 
       <!-- Sin contactos -->
       <div class="no-contacts" *ngIf="contactosFiltrados.length === 0">
-        <div class="no-contacts-icon">👥</div>
+        <div class="no-contacts-icon">­ƒæÑ</div>
         <p>No se encontraron contactos</p>
       </div>
     </div>
@@ -101,16 +101,16 @@
           <div class="msg-content">{{ mensaje.contenido }}</div>
           <div class="msg-time">{{ mensaje.fecha_envio | date:'HH:mm' }}</div>
           <div class="msg-status" *ngIf="mensaje.id_remitente === miId">
-            ✓
+            Ô£ô
           </div>
         </div>
       </div>
 
       <!-- Sin mensajes -->
       <div class="no-messages" *ngIf="mensajes.length === 0">
-        <div class="no-messages-icon">💬</div>
-        <h4>No hay mensajes aún</h4>
-        <p>¡Envía el primer mensaje a {{ obtenerNombreContacto() }}!</p>
+        <div class="no-messages-icon">­ƒÆ¼</div>
+        <h4>No hay mensajes a├║n</h4>
+        <p>┬íEnv├¡a el primer mensaje a {{ obtenerNombreContacto() }}!</p>
       </div>
     </div>
 
@@ -127,11 +127,11 @@
     >
     <button 
       (click)="enviarMensaje()" 
-      [disabled]="!nuevoMensaje.trim() || enviandoMensaje"
+      [disabled]="!nuevoMensaje?.trim() || enviandoMensaje"
       class="send-btn"
     >
       <span *ngIf="enviandoMensaje" class="spinner-small"></span>
-      <span *ngIf="!enviandoMensaje">➤</span>
+      <span *ngIf="!enviandoMensaje">Ô×ñ</span>
     </button>
   </div>
 </div>

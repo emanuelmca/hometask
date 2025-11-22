@@ -1,0 +1,195 @@
+<div class="task-detail-container">
+  
+  <!-- LOADING -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border"></div>
+    <p>Cargando tarea...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="errorMessage && !loading" class="alert alert-danger">
+    {{ errorMessage }}
+    <button class="btn-volver" (click)="volver()">← Volver</button>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div *ngIf="task && !loading" class="detail-content">
+    
+    <!-- HEADER -->
+    <div class="detail-header">
+      <button class="btn-back" (click)="volver()">
+        <span class="icon-back">←</span>
+      </button>
+      <h2 class="header-title">Detalles de Tarea</h2>
+      <button class="btn-menu">
+        <span class="icon-menu">⋮</span>
+      </button>
+    </div>
+
+    <!-- TASK CARD -->
+    <div class="task-card">
+      
+      <!-- TÍTULO Y DESCRIPCIÓN -->
+      <div class="task-header-section">
+        <h1 class="task-title">{{ task.titulo }}</h1>
+        <p class="task-description" *ngIf="task.descripcion">
+          {{ task.descripcion }}
+        </p>
+        <p class="task-description no-description" *ngIf="!task.descripcion">
+          Sin descripción
+        </p>
+      </div>
+
+      <!-- FECHAS -->
+      <div class="dates-row">
+        <div class="date-item">
+          <div class="date-label">Creado</div>
+          <div class="date-value">{{ formatearFecha(task.fecha_creacion) }}</div>
+        </div>
+        <div class="date-item deadline-item" [class.deadline-urgent]="calcularDiasRestantes() !== null && calcularDiasRestantes()! < 3">
+          <div class="date-label">Fecha Límite</div>
+          <div class="date-value" *ngIf="task.fecha_limite">{{ formatearFechaCorta(task.fecha_limite) }}</div>
+          <div class="date-value" *ngIf="!task.fecha_limite">Sin límite</div>
+        </div>
+      </div>
+
+      <!-- PLAN DE ACCIÓN -->
+      <div class="action-plan-section">
+        <div class="section-header">
+          <h3 class="section-title">Plan de acción</h3>
+          <button class="btn-assistant" (click)="navegarAsistente()">
+            <span class="icon">✨</span> Asistente
+          </button>
+        </div>
+
+        <div class="action-list">
+          <div class="action-item" *ngFor="let action of actionPlan">
+            <div class="action-checkbox" [class.checked]="action.completed">
+              <span class="checkmark" *ngIf="action.completed">✓</span>
+            </div>
+            <div class="action-content">
+              <div class="action-text">{{ action.text }}</div>
+              <div class="action-badges">
+                <span class="badge badge-status" [class]="'badge-' + action.status">
+                  {{ action.status }}
+                </span>
+                <span class="badge badge-type" *ngIf="action.type">
+                  {{ action.type }}
+                </span>
+              </div>
+            </div>
+            <button class="btn-action-menu">
+              <span class="icon-edit">✎</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASIGNADO A -->
+      <div class="assigned-section">
+        <h3 class="section-title">Asignada a</h3>
+        <div class="assigned-user">
+          <div class="user-avatar">
+            {{ obtenerNombreMiembro(task.asignado_a).charAt(0).toUpperCase() }}
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ obtenerNombreMiembro(task.asignado_a) }}</div>
+            <div class="user-username">@{{ obtenerUsernameMiembro(task.asignado_a) }}</div>
+          </div>
+          <button class="btn-message-user" (click)="navegarAMensajes()">
+            <span class="icon-message">💬</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- COMENTARIOS -->
+      <div class="comments-section">
+        <h3 class="section-title">Comentarios</h3>
+
+        <!-- Lista de comentarios -->
+        <div class="comments-list" #commentsList>
+          <div *ngIf="comments.length === 0" class="no-comments">
+            <p>No hay comentarios aún.</p>
+          </div>
+
+          <div *ngFor="let comment of comments" class="comment-item">
+            <div class="comment-avatar">
+              {{ comment.miembro.nombre_completo.charAt(0).toUpperCase() }}
+            </div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">{{ comment.miembro.nombre_completo }}</span>
+                <span class="comment-time">{{ formatearHora(comment.fecha_creacion) }}</span>
+              </div>
+              <p class="comment-text">{{ comment.texto }}</p>
+              <img *ngIf="comment.imagen_url" [src]="comment.imagen_url" alt="Imagen adjunta" class="comment-image">
+            </div>
+          </div>
+        </div>
+
+        <!-- Input de nuevo comentario -->
+        <div class="comment-input-container">
+          
+          <!-- Preview de imagen -->
+          <div *ngIf="imagenPreview" class="image-preview">
+            <img [src]="imagenPreview" alt="Preview">
+            <button class="btn-remove-image" (click)="eliminarImagenPreview()">×</button>
+          </div>
+
+          <!-- Input -->
+          <div class="input-row">
+            <input 
+              type="file" 
+              #fileInput 
+              accept="image/*" 
+              (change)="onImagenSeleccionada($event)"
+              style="display: none;"
+            >
+            <button class="btn-attach-image" (click)="fileInput.click()" title="Adjuntar imagen">
+              📎
+            </button>
+            <input 
+              type="text" 
+              class="comment-input"
+              [(ngModel)]="nuevoComentario"
+              placeholder="Añade un comentario..."
+              (keypress)="$event.key === 'Enter' && enviarComentario()"
+              [disabled]="enviandoComentario"
+            >
+            <button 
+              class="btn-send-comment" 
+              (click)="enviarComentario()"
+              [disabled]="enviandoComentario || (!nuevoComentario.trim() && !imagenSeleccionada)"
+            >
+              <span *ngIf="!enviandoComentario">➤</span>
+              <span *ngIf="enviandoComentario" class="spinner-small"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+      <button class="nav-item" (click)="navegarA('/dashboard')">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Panel</span>
+      </button>
+      <button class="nav-item active">
+        <span class="nav-icon">✓</span>
+        <span class="nav-label">Tareas</span>
+      </button>
+      <button class="nav-item" (click)="navegarA('/calendar')">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Calendario</span>
+      </button>
+      <button class="nav-item" (click)="navegarA('/members')">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Miembros</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>

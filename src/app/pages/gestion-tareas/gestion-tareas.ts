@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
 
@@ -47,19 +47,19 @@ export class TasksComponent implements OnInit {
   tareas: Tarea[] = [];
   miembros: Miembro[] = [];
   tareasFiltradas: Tarea[] = [];
-  
+
   // Estados
   loading = false;
   errorMessage = '';
   filtroEstado = 'todas';
-  
+
   // Modal
   mostrarModal = false;
   editando = false;
   guardandoTarea = false;
   errorModal = '';
   tareaEditando: Tarea | null = null;
-  
+
   // Nueva tarea
   nuevaTarea = {
     titulo: '',
@@ -74,7 +74,7 @@ export class TasksComponent implements OnInit {
   private idHogar = localStorage.getItem('id_hogar');
   private idMiembro = localStorage.getItem('id_miembro');
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
     this.cargarTareas();
@@ -289,14 +289,14 @@ export class TasksComponent implements OnInit {
   private manejarErrorGuardado(err: any): void {
     console.error('❌ Error guardando tarea:', err);
     this.guardandoTarea = false;
-    
+
     let mensaje = 'Error al guardar la tarea';
     if (err.status === 400) {
       mensaje = 'Datos inválidos';
     } else if (err.status === 401) {
       mensaje = 'No autorizado';
     }
-    
+
     this.errorModal = mensaje;
   }
 
@@ -305,9 +305,9 @@ export class TasksComponent implements OnInit {
     const estados = ['pendiente', 'en_progreso', 'completada', 'cancelada'];
     const estadoActual = estados.indexOf(tarea.estado_actual);
     const siguienteEstado = estados[(estadoActual + 1) % estados.length];
-    
+
     const confirmacion = confirm(`¿Cambiar estado de "${tarea.titulo}" a "${this.getEstadoTexto(siguienteEstado)}"?`);
-    
+
     if (!confirmacion) return;
 
     const headers = this.buildAuthHeaders();
@@ -316,8 +316,8 @@ export class TasksComponent implements OnInit {
       return;
     }
 
-    this.http.put<Tarea>(`${this.baseUrl}/tareas/${tarea.id}/estado`, 
-      { estado_actual: siguienteEstado }, 
+    this.http.put<Tarea>(`${this.baseUrl}/tareas/${tarea.id}/estado`,
+      { estado_actual: siguienteEstado },
       { headers }
     ).subscribe({
       next: (resp) => {
@@ -329,5 +329,10 @@ export class TasksComponent implements OnInit {
         alert('❌ Error al cambiar el estado');
       }
     });
+  }
+
+  // Navegar a detalles de tarea
+  navegarADetalle(id: number): void {
+    this.router.navigate(['/task-detail', id]);
   }
 }
