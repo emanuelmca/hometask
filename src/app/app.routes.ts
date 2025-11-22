@@ -5,7 +5,11 @@ import { RegisterComponent } from './pages/register/register';
 import { AdminDashboard } from './pages/admin-dashboard/admin-dashboard';
 import { Members } from './pages/members/members';
 import { MemberGuard } from './guards/role-guard';
-import { DashboardMember } from './features/member/dashboard-member/dashboard-member';
+import { TasksComponent } from './pages/gestion-tareas/gestion-tareas';
+import { EventsComponent } from './pages/gestion-eventos/gestion-eventos';
+import { MemberDashboardComponent } from './pages/dash-miembro/dash-miembro';
+
+
 
 
 export const routes: Routes = [
@@ -14,7 +18,9 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'dashboard', component: AdminDashboard, canActivate: [MemberGuard] },
   { path: 'members', component: Members, canActivate: [MemberGuard] },
-  {path: 'dashboard-member', component: DashboardMember, canActivate: [MemberGuard]},
-  { path: '**', redirectTo: '/login' }
+  { path: 'tasks', component: TasksComponent, canActivate: [MemberGuard] },
+  { path: 'events', component: EventsComponent, canActivate: [MemberGuard] },
+  {path: 'dash-miembro', component: MemberDashboardComponent, canActivate: [MemberGuard]},
+  { path: '**', redirectTo: '/login' },
 
 ];

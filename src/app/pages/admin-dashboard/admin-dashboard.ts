@@ -31,8 +31,29 @@ interface Miembro {
   rol: Rol;
 }
 
+interface Tarea {
+  titulo: string;
+  descripcion: string;
+  categoria: string;
+  fecha_limite: string;
+  repeticion: string;
+  asignado_a: number;
+  id_hogar: number;
+  ubicacion: string | null;
+  id_evento: number | null;
+  id: number;
+  estado: boolean;
+  estado_actual: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
+  fecha_asignacion: string;
+  tiempo_total_segundos: number | null;
+  creado_por: number;
+  comentarios: any[];
+}
+
 // -------------------------------------------------------------------
-// 2. Componente principal (con plantilla mínima para ejecución)
+// 2. Componente principal
 // -------------------------------------------------------------------
 
 @Component({
@@ -49,18 +70,16 @@ interface Miembro {
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
-
 })
 
 export class AdminDashboard implements OnInit {
 
-  // Dependencias inyectadas (uso moderno de Angular)
+  // Dependencias inyectadas
   private http = inject(HttpClient);
 
-  // Propiedades existentes (renombré el tipo de eventos para ser más claro)
+  // Propiedades existentes
   cantidadMiembros: number | null = null;
   nombreHogar: string = '';
-  // El ID del hogar se obtiene aquí del localStorage
   idHogar = localStorage.getItem('id_hogar'); 
   eventos: { titulo: string, fecha_hora: string }[] = [];
   private baseUrl = 'http://127.0.0.1:8000';
@@ -69,8 +88,10 @@ export class AdminDashboard implements OnInit {
   // 👉 PROPIEDADES DE ESTADO
   // -------------------------------------------------------------------
   miembros: Miembro[] = [];
-  // ✅ totalMiembros ahora se usa solo para el conteo total
-  totalMiembros: number | null = null; 
+  totalMiembros: number | null = null;
+  
+  // 👉 NUEVA PROPIEDAD: Lista de tareas
+  tareas: Tarea[] = [];
 
   // ----------------------------
   // Construir Headers con Token
@@ -147,7 +168,6 @@ export class AdminDashboard implements OnInit {
     const headers = this.buildAuthHeaders();
     if (!headers || !this.idHogar) {
       console.warn("Token o ID de Hogar no disponible. No se cargarán los miembros.");
-      // Establecer 0 si falta el ID de hogar para que la UI no se quede en 'Cargando...'
       this.totalMiembros = 0; 
       return;
     }
@@ -158,17 +178,43 @@ export class AdminDashboard implements OnInit {
     this.http.get<Miembro[]>(url, { headers })
       .subscribe({
         next: (resp) => {
-          this.miembros = resp; // 👈 Lista completa ahora se usa en la plantilla
+          this.miembros = resp;
           this.totalMiembros = resp.length; 
           console.log(`Miembros cargados exitosamente. Total: ${this.totalMiembros}`);
         },
         error: (err) => {
           console.error("❌ Error al cargar la lista completa de miembros:", err);
-          this.totalMiembros = 0; // Mostrar 0 en caso de error de API
+          this.totalMiembros = 0;
         }
       });
   }
-  
+
+  // -------------------------------------------------------------------
+  // 🆕 FUNCIÓN: Cargar tareas del hogar
+  // -------------------------------------------------------------------
+  cargarTareas(): void {
+    const headers = this.buildAuthHeaders();
+    if (!headers) {
+      console.warn("Token no disponible. No se cargarán las tareas.");
+      return;
+    }
+
+    const url = `${this.baseUrl}/tareas/hogar/todas`;
+    console.log(`Cargando tareas desde: ${url}`);
+    
+    this.http.get<Tarea[]>(url, { headers })
+      .subscribe({
+        next: (resp) => {
+          this.tareas = resp;
+          console.log(`✅ Tareas cargadas exitosamente. Total: ${this.tareas.length}`);
+        },
+        error: (err) => {
+          console.error("❌ Error al cargar las tareas:", err);
+          this.tareas = []; // Lista vacía en caso de error
+        }
+      });
+  }
+
   // --------------------------------
   // El que ya tenías
   // --------------------------------
@@ -181,8 +227,9 @@ export class AdminDashboard implements OnInit {
     this.cargarCantidadMiembros();
     this.cargarNombreHogar();
     this.cargarEventos();
-    
-    // LLAMADA A LA FUNCIÓN DE MIEMBROS
     this.cargarMiembros();
+    
+    // 🆕 LLAMADA A LA FUNCIÓN DE TAREAS
+    this.cargarTareas();
   }
 }

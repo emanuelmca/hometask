@@ -2,12 +2,40 @@
 
 <div class="dashboard-wrapper">
 
-  <!-- SIDEBAR IZQUIERDO: TAREAS FIJAS -->
+  <!-- SIDEBAR IZQUIERDA FIJA - TAREAS -->
   <div class="sidebar-left">
-    <div class="bento-item sidebar-tareas gradient-2">
+    <div class="sidebar-tareas">
       <h3>Tareas</h3>
       <p>Control general del hogar.</p>
-      <button class="button-group" routerLink="/admin/tareas">Ver Tareas</button>
+      
+      <!-- Lista de Tareas -->
+      <div class="tareas-list" *ngIf="tareas.length > 0; else noTareas">
+        <div class="tarea-item" *ngFor="let tarea of tareas | slice:0:5">
+          <div class="tarea-header">
+            <span class="tarea-titulo">{{ tarea.titulo }}</span>
+            <span class="tarea-estado" [class]="'estado-' + tarea.estado_actual">
+              {{ tarea.estado_actual }}
+            </span>
+          </div>
+          <div class="tarea-info">
+            <span class="tarea-categoria">📁 {{ tarea.categoria }}</span>
+            <span class="tarea-fecha" *ngIf="tarea.fecha_limite">
+              📅 {{ tarea.fecha_limite | date:'shortDate' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <ng-template #noTareas>
+        <p class="no-tareas-text">No hay tareas pendientes.</p>
+      </ng-template>
+
+      <!-- Contador de tareas -->
+      <div class="tareas-count">
+        📊 {{ tareas.length }} tarea{{ tareas.length !== 1 ? 's' : '' }}
+      </div>
+
+      <button class="button-group" routerLink="/tasks">Ver Todas las Tareas</button>
     </div>
   </div>
 
@@ -21,39 +49,32 @@
     </div>
 
     <!-- Miembros -->
-          <div class="bento-item gradient-1 flex flex-col justify-between">
-            <div>
-              <h3 class="text-xl font-bold mb-2">Miembros</h3>
-              
-              <!-- Lista de Nombres de Miembros -->
-              <ul *ngIf="miembros.length > 0; else noMiembros" class="space-y-1 text-base font-medium list-none p-0">
-                <li *ngFor="let miembro of miembros | slice:0:5" class="truncate">
-                  <span class="text-indigo-700 mr-2">•</span>{{ miembro.nombre_completo }}
-                </li>
-              </ul>
-              <ng-template #noMiembros>
-                <p class="text-sm italic text-gray-500">No hay miembros registrados.</p>
-              </ng-template>
-
-              <!-- Conteo total abajo -->
-              <p class="text-sm text-indigo-500 mt-3">
-                Total: {{ totalMiembros !== null ? totalMiembros : 'Cargando...' }}
-              </p>
-
-            </div>
-            <button class="button-group bg-indigo-500 hover:bg-indigo-600 mt-4" [routerLink]="['/admin/miembros']">Ir a Miembros</button>
-          </div>
+    <div class="bento-item gradient-1 flex flex-col justify-between">
+      <div>
+        <h3 class="text-xl font-bold mb-2">Miembros</h3>
+        <ul *ngIf="miembros.length > 0; else noMiembros" class="space-y-1 text-base font-medium list-none p-0">
+          <li *ngFor="let miembro of miembros | slice:0:5" class="truncate">
+            <span class="text-indigo-700 mr-2">•</span>{{ miembro.nombre_completo }}
+          </li>
+        </ul>
+        <ng-template #noMiembros>
+          <p class="text-sm italic text-gray-500">No hay miembros registrados.</p>
+        </ng-template>
+        <p class="text-sm text-indigo-500 mt-3">
+          Total: {{ totalMiembros !== null ? totalMiembros : 'Cargando...' }}
+        </p>
+      </div>
+      <button class="button-group bg-indigo-500 hover:bg-indigo-600 mt-4" [routerLink]="['/members']">Ir a Miembros</button>
+    </div>
 
     <!-- Hogares -->
-   <div class="bento-item gradient-5">
-  <h3>Hogar</h3>
-
-  <p><strong>Nombre:</strong> {{ nombreHogar || 'Cargando...' }}</p>
-
-  <p><strong>Miembros:</strong> 
-    {{ cantidadMiembros !== null ? cantidadMiembros : 'Cargando...' }}
-  </p>
-</div>
+    <div class="bento-item gradient-5">
+      <h3>Hogar</h3>
+      <p><strong>Nombre:</strong> {{ nombreHogar || 'Cargando...' }}</p>
+      <p><strong>Miembros:</strong> 
+        {{ cantidadMiembros !== null ? cantidadMiembros : 'Cargando...' }}
+      </p>
+    </div>
 
     <!-- Estadísticas -->
     <div class="bento-item gradient-6">
@@ -61,33 +82,24 @@
       <p>Actividad y progreso.</p>
       <div class="stats-box">
         <span>📊 86% completado</span>
-        <span>🗂 42 tareas</span>
+        <span>🗂 {{ tareas.length }} tareas</span>
       </div>
     </div>
 
-<!-- Eventos -->
-<div class="bento-item gradient-3">
-  <h3>Eventos</h3>
-  <p>Agenda y actividades.</p>
-
- <ul *ngIf="eventos!.length > 0">
-  <li *ngFor="let ev of eventos | slice:0:10">
-    <strong>{{ ev.titulo }}</strong><br>
-    {{ ev.fecha_hora | date:'mediumDate' }} – {{ ev.fecha_hora | date:'shortTime' }}
-  </li>
-</ul>
-
-
-  <ng-template #noEventos>
-    <p>No hay eventos registrados.</p>
-  </ng-template>
-
-  <button class="button-group" routerLink="/admin/eventos">Ver Eventos</button>
-</div>
-
+    <!-- Eventos -->
+    <div class="bento-item gradient-3">
+      <h3>Eventos</h3>
+      <p>Agenda y actividades.</p>
+      <ul *ngIf="eventos!.length > 0" class="event-list">
+        <li *ngFor="let ev of eventos | slice:0:10">
+          <strong>{{ ev.titulo }}</strong><br>
+          {{ ev.fecha_hora | date:'mediumDate' }} – {{ ev.fecha_hora | date:'shortTime' }}
+        </li>
+      </ul>
+      <button class="button-group" routerLink="/events">Ver Eventos</button>
+    </div>
 
   </div>
-
 </div>
 
 <!-- CHAT FLOTANTE -->

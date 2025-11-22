@@ -73,7 +73,8 @@ export class Login {
                 } 
                 else
                    {
-                  this.router.navigate(['/dashboard-member']);
+                    console.log("Redirigiendo a dash-miembro");
+                  this.router.navigate(['/dash-miembro']);
                 }
 
               }, 1500);

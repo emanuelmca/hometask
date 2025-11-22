@@ -1,58 +1,171 @@
 <app-nav></app-nav>
 
-<div class="members-container container mt-4">
+<div class="members-container">
+  <div class="container">
 
-  <h2 class="text-center mb-4">Lista de Miembros</h2>
+    <!-- HEADER MEJORADO -->
+    <div class="members-header text-center">
+      <div class="row align-items-center">
+        <div class="col-md-8 text-md-start">
+          <h2>Gestión de Miembros</h2>
+          <p class="text-muted mb-0">Administra los miembros de tu hogar</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <div class="d-flex align-items-center justify-content-md-end justify-content-center gap-3">
+            <span class="members-count">
+              📊 Total: {{ miembros.length }} miembro{{ miembros.length !== 1 ? 's' : '' }}
+            </span>
+            <button class="btn btn-add-member" (click)="abrirModalAgregar()">
+              ➕ Nuevo Miembro
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Error -->
-  <div *ngIf="errorMessage" class="alert alert-danger text-center">
-    {{ errorMessage }}
-  </div>
+    <!-- MENSAJES DE ESTADO -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>⚠️ Error:</strong> {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+    </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="text-center mt-5">
-    <div class="spinner-border text-primary" role="status"></div>
-  </div>
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-border spinner-large text-primary" role="status">
+        <span class="visually-hidden">Cargando miembros...</span>
+      </div>
+      <p class="mt-3 text-muted">Cargando miembros...</p>
+    </div>
 
-  <!-- Listado -->
-  <div class="row" *ngIf="!loading">
-    <div class="col-md-4 mb-4" *ngFor="let m of miembros">
-      <div class="card member-card shadow-sm">
+    <!-- ESTADO VACÍO -->
+    <div *ngIf="!loading && miembros.length === 0 && !errorMessage" class="empty-state">
+      <div class="empty-icon mb-4">👥</div>
+      <h4>No hay miembros en este hogar</h4>
+      <p class="text-muted">Comienza agregando el primer miembro a tu hogar familiar</p>
+      <button class="btn btn-add-member" (click)="abrirModalAgregar()">
+        ➕ Agregar Primer Miembro
+      </button>
+    </div>
 
+    <!-- GRID DE MIEMBROS -->
+    <div class="members-grid" *ngIf="!loading && miembros.length > 0">
+      <div class="member-card" *ngFor="let m of miembros">
         <div class="card-body">
-          <h5 class="card-title">
-            {{ m.nombre_completo }}
-            <span class="badge ms-2"
-              [ngClass]="m.estado ? 'bg-success' : 'bg-secondary'">
+
+          <!-- HEADER CON NOMBRE Y ESTADO -->
+          <div class="member-header">
+            <h5 class="member-name">{{ m.nombre_completo }}</h5>
+            <span class="status-badge" [ngClass]="m.estado ? 'badge-active' : 'badge-inactive'">
               {{ m.estado ? 'Activo' : 'Inactivo' }}
             </span>
-          </h5>
+          </div>
 
-          <p class="text-muted mb-1">
-            📧 {{ m.correo_electronico }}
-          </p>
+          <!-- INFORMACIÓN DEL MIEMBRO -->
+          <div class="member-info">
+            <div class="info-item">
+              <span>📧</span>
+              <span class="ms-2">{{ m.correo_electronico }}</span>
+            </div>
 
-          <p class="mb-1">
-            🏷 Rol: <strong>{{ m.rol.nombre }}</strong>
-          </p>
+            <div class="info-item">
+              <span>🏷️</span>
+              <span class="ms-2">
+                Rol: <span class="role-badge">{{ m.rol?.nombre || 'Sin rol' }}</span>
+              </span>
+            </div>
 
-          <p class="small text-muted">
-            Hogar #{{ m.id_hogar }}
-          </p>
+            <div class="info-item">
+              <span>🏠</span>
+              <span class="ms-2">Hogar #{{ m.id_hogar }}</span>
+            </div>
 
-          <p class="text-muted small">
-            Creado: {{ m.fecha_creacion | date:'short' }}
-          </p>
+            <div class="info-item">
+              <span>📅</span>
+              <span class="ms-2">Creado: {{ m.fecha_creacion | date:'mediumDate' }}</span>
+            </div>
+          </div>
 
-          <!-- BOTÓN EDITAR -->
-          <button class="btn btn-primary btn-sm mt-2" (click)="editarNombre(m)">
-            ✏️ Editar nombre
-          </button>
+          <!-- ACCIONES -->
+          <div class="member-actions">
+            <button class="btn-action btn-edit" (click)="editarMiembro(m)">
+              ✏️ Editar
+            </button>
+            <button class="btn-action btn-deactivate" (click)="cambiarEstado(m)" [class.btn-activate]="!m.estado">
+              {{ m.estado ? '🚫 Desactivar' : '✅ Activar' }}
+            </button>
+          </div>
 
         </div>
+      </div>
+    </div>
 
+  </div>
+</div>
+
+<!-- MODAL PARA AGREGAR/EDITAR MIEMBRO -->
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editando ? '✏️ Editar Miembro' : '➕ Agregar Nuevo Miembro' }}
+        </h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="errorAgregar" class="alert alert-danger">
+          {{ errorAgregar }}
+        </div>
+
+        <form (ngSubmit)="agregarMiembro()" #miembroForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre Completo *</label>
+            <input type="text" class="form-control" [(ngModel)]="nuevoMiembro.nombre_completo" name="nombre_completo"
+              required placeholder="Ej: Juan Pérez">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Correo Electrónico *</label>
+            <input type="email" class="form-control" [(ngModel)]="nuevoMiembro.correo_electronico"
+              name="correo_electronico" required placeholder="Ej: usuario@ejemplo.com">
+
+
+            <!-- En el formulario del modal -->
+            <div class="mb-3" *ngIf="!editando">
+              <label class="form-label">Contraseña *</label>
+              <input type="password" class="form-control" [(ngModel)]="nuevoMiembro.contrasena" name="contrasena"
+                [required]="!editando" placeholder="Mínimo 6 caracteres">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rol *</label>
+            <select class="form-select" [(ngModel)]="nuevoMiembro.id_rol" name="id_rol" required>
+              <option value="">Seleccionar rol</option>
+              <option value="1">Administrador</option>
+              <option value="2">Miembro</option>
+              <!-- Agrega más roles según tu API -->
+            </select>
+          </div>
+
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="!miembroForm.form.valid || agregandoMiembro">
+              <span *ngIf="agregandoMiembro" class="spinner-border spinner-border-sm me-2"></span>
+              {{ agregandoMiembro ? 'Procesando...' : (editando ? 'Actualizar' : 'Agregar Miembro') }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
 </div>
+
+<!-- FONDO DEL MODAL -->
+<div *ngIf="mostrarModal" class="modal-backdrop fade show"></div>
+
+<!-- CHAT FLOTANTE -->
+<app-chat-floating></app-chat-floating>

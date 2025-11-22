@@ -25,7 +25,6 @@ export class RegisterComponent {
     correo_electronico: ['', [Validators.required, Validators.email]],
     contrasena: ['', [Validators.required, Validators.minLength(6)]],
     id_rol: [2, Validators.required],  // usuario por defecto
-    id_hogar: [1, Validators.required] // hogar fijo por ahora
   });
 
   onSubmit() {
@@ -38,7 +37,7 @@ export class RegisterComponent {
 
   const data = {
     ...this.registerForm.value,
-    id_rol: Number(this.registerForm.value.id_rol)
+    id_rol: Number(1)
   
   } as any;
 

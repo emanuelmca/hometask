@@ -1,0 +1,81 @@
+<app-nav-miembro></app-nav-miembro>
+
+<div class="member-dashboard">
+  <div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <h1>Buenos días, Alex</h1>
+      <p>Aquí tienes un resumen de tu hogar para hoy.</p>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="dashboard-content">
+      <!-- Columna Izquierda -->
+      <div class="main-column">
+        <!-- Mis Tareas Hoy -->
+        <div class="card tasks-card">
+          <h2>Mis Tareas Hoy</h2>
+          <div class="tasks-list">
+            <div class="task-item" *ngFor="let task of tasks">
+              <label class="task-checkbox">
+                <input type="checkbox" [checked]="task.completed" (change)="toggleTask(task.id)">
+                <span class="checkmark"></span>
+              </label>
+              <div class="task-content">
+                <span class="task-text" [class.completed]="task.completed">{{ task.title }}</span>
+                <span class="task-tag urgent" *ngIf="task.urgent">Urgente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximos Eventos -->
+        <div class="card events-card">
+          <h2>Próximos Eventos</h2>
+          <div class="events-list">
+            <div class="event-item" *ngFor="let event of events">
+              <div class="event-number">{{ event.number }}</div>
+              <div class="event-content">
+                <span class="event-text" [class.completed]="event.completed">{{ event.title }}</span>
+                <span class="event-date">{{ event.date }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha -->
+      <div class="sidebar-column">
+        <!-- Lista de la Compra -->
+        <div class="card shopping-card">
+          <h2>Lista de la Compra</h2>
+          <div class="shopping-list">
+            <div class="shopping-item" *ngFor="let item of shoppingList">
+              <label class="shopping-checkbox">
+                <input type="checkbox" [checked]="item.completed" (change)="toggleShoppingItem(item.id)">
+                <span class="checkmark"></span>
+              </label>
+              <span class="shopping-text" [class.completed]="item.completed">{{ item.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información del Hogar -->
+        <div class="card home-info-card">
+          <h2>En Casa</h2>
+          <div class="weather-info">
+            <div class="temperature">24°C</div>
+            <div class="weather-condition">Soleado</div>
+            <div class="location">Madrid, ES</div>
+          </div>
+        </div>
+
+        <!-- Recordatorio Rápido -->
+        <div class="reminder-card">
+          <h3>Recordatorio Rápido</h3>
+          <p>No olvidar recoger el paquete de la tintorería antes de las 18h.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

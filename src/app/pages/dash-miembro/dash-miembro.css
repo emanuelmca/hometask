@@ -1,0 +1,336 @@
+.member-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.dashboard-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 300;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dashboard-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.card h2 {
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ecf0f1;
+  font-weight: 600;
+}
+
+/* Tareas */
+.tasks-list .task-item,
+.events-list .event-item,
+.shopping-list .shopping-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+.tasks-list .task-item:last-child,
+.events-list .event-item:last-child,
+.shopping-list .shopping-item:last-child {
+  border-bottom: none;
+}
+
+.tasks-list .task-item:hover,
+.events-list .event-item:hover,
+.shopping-list .shopping-item:hover {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 0 -10px;
+  padding: 15px 10px;
+}
+
+/* Checkboxes personalizados */
+.task-checkbox,
+.shopping-checkbox {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.task-checkbox input,
+.shopping-checkbox input {
+  display: none;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #bdc3c7;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.task-checkbox input:checked + .checkmark,
+.shopping-checkbox input:checked + .checkmark {
+  background-color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.checkmark:after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.task-checkbox input:checked + .checkmark:after,
+.shopping-checkbox input:checked + .checkmark:after {
+  display: block;
+}
+
+.task-content,
+.event-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.task-text,
+.event-text,
+.shopping-text {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.task-text.completed,
+.shopping-text.completed {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+.task-tag {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  align-self: flex-start;
+}
+
+.task-tag.urgent {
+  background-color: #ffeaa7;
+  color: #e17055;
+}
+
+/* Eventos */
+.event-number {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.event-date {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Lista de la Compra */
+.shopping-list .shopping-item {
+  padding: 12px 0;
+}
+
+.shopping-text {
+  font-size: 1rem;
+}
+
+/* Información del Hogar */
+.home-info-card {
+  text-align: center;
+}
+
+.weather-info {
+  padding: 10px 0;
+}
+
+.temperature {
+  font-size: 2.5rem;
+  font-weight: 300;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.weather-condition {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin-bottom: 5px;
+}
+
+.location {
+  font-size: 1rem;
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Recordatorio */
+.reminder-card {
+  background: linear-gradient(135deg, #fff9e6, #fff3cd);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #f1c40f;
+}
+
+.reminder-card h3 {
+  color: #f39c12;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.reminder-card p {
+  color: #e67e22;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .sidebar-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  
+  .reminder-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .member-dashboard {
+    padding: 10px;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .dashboard-header p {
+    font-size: 1rem;
+  }
+  
+  .card {
+    padding: 20px;
+  }
+  
+  .sidebar-column {
+    grid-template-columns: 1fr;
+  }
+  
+  .temperature {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .task-text,
+  .event-text,
+  .shopping-text {
+    font-size: 1rem;
+  }
+  
+  .temperature {
+    font-size: 1.8rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.tasks-card { animation-delay: 0.1s; }
+.events-card { animation-delay: 0.2s; }
+.shopping-card { animation-delay: 0.3s; }
+.home-info-card { animation-delay: 0.4s; }
+.reminder-card { animation-delay: 0.5s; }

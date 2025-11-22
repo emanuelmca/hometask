@@ -1,12 +1,12 @@
 <div class="login-container">
   <div class="login-box">
-   <div class="icon-wrapper">
-        <svg class="home-icon" viewBox="0 0 24 24" fill="none">
-          <path d="M3 10L12 3L21 10V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V10Z" stroke="white"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M9 21V14H15V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </div>
+    <div class="icon-wrapper">
+      <svg class="home-icon" viewBox="0 0 24 24" fill="none">
+        <path d="M3 10L12 3L21 10V20C21 20.55 20.55 21 20 21H4C3.45 21 3 20.55 3 20V10Z" stroke="white" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M9 21V14H15V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
     <p class="subtitle">Inicia sesión</p>
 
     <form (ngSubmit)="login()" #loginForm="ngForm">
@@ -36,7 +36,7 @@
     <p class="register-text">
       ¿No tienes una cuenta?
       <a routerLink="/register" class="register-link">Regístrate</a>
-         
+
     </p>
 
     <div *ngIf="successMessage" class="alert alert-success text-center mt-3">
@@ -44,7 +44,7 @@
     </div>
 
     <!-- Mensaje de error -->
-    
+
   </div>
 
 </div>

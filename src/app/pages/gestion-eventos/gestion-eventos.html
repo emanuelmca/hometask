@@ -1,0 +1,291 @@
+<app-nav></app-nav>
+
+<div class="events-container">
+  <div class="container-fluid">
+    
+    <!-- HEADER -->
+    <div class="events-header">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1>📅 Gestor de Eventos</h1>
+          <p class="text-muted">Organiza y gestiona los eventos de tu hogar</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-primary" (click)="abrirModalCrearEvento()">
+            ➕ Nuevo Evento
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTROS Y ESTADÍSTICAS -->
+    <div class="events-filters">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="filter-buttons">
+            <button 
+              class="btn-filter" 
+              [class.active]="filtroVista === 'calendario'"
+              (click)="cambiarVista('calendario')"
+            >
+              📅 Calendario
+            </button>
+            <button 
+              class="btn-filter" 
+              [class.active]="filtroVista === 'lista'"
+              (click)="cambiarVista('lista')"
+            >
+              📋 Lista
+            </button>
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <div class="events-stats">
+            <span class="stat-item">
+              📊 Total: {{ eventos.length }}
+            </span>
+            <span class="stat-item">
+              🗓️ Este mes: {{ eventosEsteMes.length }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENSAJES DE ESTADO -->
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible">
+      {{ errorMessage }}
+      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-border text-primary"></div>
+      <p>Cargando eventos...</p>
+    </div>
+
+    <!-- VISTA CALENDARIO -->
+    <div class="calendar-view" *ngIf="!loading && filtroVista === 'calendario'">
+      <div class="calendar-container">
+        <app-calendar></app-calendar>
+      </div>
+    </div>
+
+    <!-- VISTA LISTA -->
+    <div class="list-view" *ngIf="!loading && filtroVista === 'lista'">
+      
+      <!-- Filtros de fecha -->
+      <div class="date-filters">
+        <div class="filter-group">
+          <label>Filtrar por:</label>
+          <select class="form-select-sm" [(ngModel)]="filtroFecha" (change)="aplicarFiltros()">
+            <option value="todos">Todos los eventos</option>
+            <option value="hoy">Hoy</option>
+            <option value="semana">Esta semana</option>
+            <option value="mes">Este mes</option>
+            <option value="futuro">Próximos</option>
+            <option value="pasado">Pasados</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Ordenar por:</label>
+          <select class="form-select-sm" [(ngModel)]="orden" (change)="aplicarFiltros()">
+            <option value="fecha_asc">Fecha (más antiguo primero)</option>
+            <option value="fecha_desc">Fecha (más reciente primero)</option>
+            <option value="titulo_asc">Título (A-Z)</option>
+            <option value="titulo_desc">Título (Z-A)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- LISTA DE EVENTOS -->
+      <div class="events-list">
+        <div class="event-card" *ngFor="let evento of eventosFiltrados" [class.pasado]="esEventoPasado(evento)">
+          
+          <!-- HEADER DEL EVENTO -->
+          <div class="event-header">
+            <div class="event-title-section">
+              <h3 class="event-title">{{ evento.titulo }}</h3>
+              <div class="event-meta">
+                <span class="event-date">
+                  🗓️ {{ evento.fecha_hora | date:'fullDate':'':'es' }}
+                </span>
+                <span class="event-time">
+                  ⏰ {{ evento.fecha_hora | date:'shortTime' }}
+                </span>
+                <span class="event-duration" *ngIf="evento.duracion_min">
+                  ⏱️ {{ evento.duracion_min }} min
+                </span>
+              </div>
+            </div>
+            <div class="event-actions">
+              <button class="btn-action" (click)="editarEvento(evento)" title="Editar">
+                ✏️
+              </button>
+              <button class="btn-action btn-danger" (click)="eliminarEvento(evento)" title="Eliminar">
+                🗑️
+              </button>
+            </div>
+          </div>
+
+          <!-- DESCRIPCIÓN -->
+          <p class="event-description" *ngIf="evento.descripcion">{{ evento.descripcion }}</p>
+
+          <!-- INFORMACIÓN ADICIONAL -->
+          <div class="event-details">
+            <div class="event-detail">
+              <span class="detail-label">🏠 Hogar:</span>
+              <span class="detail-value">#{{ evento.id_hogar }}</span>
+            </div>
+            <div class="event-detail">
+              <span class="detail-label">👤 Creado por:</span>
+              <span class="detail-value">
+                {{ obtenerNombreCreador(evento.creado_por) }}
+              </span>
+            </div>
+            <div class="event-detail">
+              <span class="detail-label">📅 Creado:</span>
+              <span class="detail-value">{{ obtenerFechaCreacion(evento.id) | date:'medium' }}</span>
+            </div>
+          </div>
+
+          <!-- ETIQUETA DE EVENTO PASADO -->
+          <div class="event-past-badge" *ngIf="esEventoPasado(evento)">
+            ⏳ Evento pasado
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ESTADO VACÍO -->
+      <div *ngIf="!loading && eventosFiltrados.length === 0" class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No hay eventos</h3>
+        <p *ngIf="filtroFecha !== 'todos'">
+          No hay eventos que coincidan con el filtro "{{ obtenerTextoFiltro() }}"
+        </p>
+        <p *ngIf="filtroFecha === 'todos'">
+          Comienza creando el primer evento para tu hogar
+        </p>
+        <button class="btn btn-primary" (click)="abrirModalCrearEvento()">
+          ➕ Crear Primer Evento
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL PARA CREAR/EDITAR EVENTO -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>{{ editando ? '✏️ Editar Evento' : '➕ Crear Nuevo Evento' }}</h3>
+      <button class="close-btn" (click)="cerrarModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div *ngIf="errorModal" class="alert alert-danger">
+        {{ errorModal }}
+      </div>
+
+      <form (ngSubmit)="guardarEvento()" #eventoForm="ngForm">
+        
+        <div class="form-group">
+          <label>Título del Evento *</label>
+          <input 
+            type="text" 
+            class="form-control"
+            [(ngModel)]="nuevoEvento.titulo"
+            name="titulo"
+            required
+            placeholder="Ej: Reunión familiar, Cumpleaños, etc."
+          >
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea 
+            class="form-control"
+            [(ngModel)]="nuevoEvento.descripcion"
+            name="descripcion"
+            rows="3"
+            placeholder="Descripción detallada del evento..."
+          ></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Fecha *</label>
+              <input 
+                type="date" 
+                class="form-control"
+                [(ngModel)]="nuevoEvento.fecha"
+                name="fecha"
+                required
+                (change)="actualizarFechaHora()"
+              >
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label>Hora *</label>
+              <input 
+                type="time" 
+                class="form-control"
+                [(ngModel)]="nuevoEvento.hora"
+                name="hora"
+                required
+                (change)="actualizarFechaHora()"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Duración (minutos)</label>
+          <select 
+            class="form-control"
+            [(ngModel)]="nuevoEvento.duracion_min"
+            name="duracion_min"
+          >
+            <option value="30">30 minutos</option>
+            <option value="60" selected>1 hora</option>
+            <option value="90">1.5 horas</option>
+            <option value="120">2 horas</option>
+            <option value="180">3 horas</option>
+            <option value="240">4 horas</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cerrarModal()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!eventoForm.form.valid || guardandoEvento"
+          >
+            <span *ngIf="guardandoEvento" class="spinner"></span>
+            {{ guardandoEvento ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear Evento') }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- CHAT FLOTANTE -->
+<app-chat-floating></app-chat-floating>

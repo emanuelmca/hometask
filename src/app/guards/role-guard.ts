@@ -14,7 +14,7 @@ export class MemberGuard implements CanActivate {
   
     console.log(token, " _______________ ", rol);
 
-    if (token && (rol === 'Miembro' || rol === 'Administrador')) {
+    if (token && (rol === 'Hijo' || rol === 'Administrador')) {
       console.log('Acceso concedido por MemberGuard');
       return true;
 

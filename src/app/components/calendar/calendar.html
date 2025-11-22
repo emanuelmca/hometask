@@ -1,36 +1,158 @@
 <div class="calendar-container">
 
   <div class="calendar-header">
-    <button mat-icon-button (click)="prevMonth()">
+    <button (click)="prevMonth()" title="Mes anterior">
       ‹
     </button>
 
     <h3>{{ monthName }} {{ year }}</h3>
 
-    <button mat-icon-button (click)="nextMonth()">
+    <button (click)="nextMonth()" title="Mes siguiente">
       ›
     </button>
   </div>
 
-  <!-- Encabezado -->
+  <!-- Encabezado de días -->
   <div class="calendar-grid">
     <div class="day-name" *ngFor="let d of dayNames">{{ d }}</div>
 
     <!-- Celdas del calendario -->
     <div 
       class="day-cell"
-      *ngFor="let day of calendarDays"
       [class.empty]="day === null"
+      [class.current-day]="isCurrentDay(day)"
+      [class.weekend]="isWeekend(day)"
+      [class.has-events]="eventosDelDia(day).length > 0"
+      (click)="abrirModalCrearEvento(day)"
+      *ngFor="let day of calendarDays"
     >
 
       <div *ngIf="day" class="day-number">{{ day }}</div>
 
       <!-- EVENTOS -->
-      <div class="event-dot" *ngFor="let ev of eventosDelDia(day)">
-        {{ ev.titulo }}
+      <div class="events-container">
+        <div 
+          class="event-dot" 
+          *ngFor="let ev of eventosDelDia(day) | slice:0:1"
+          [title]="ev.titulo + ' - ' + (ev.fecha_hora | date:'shortTime')"
+        >
+          {{ ev.titulo }}
+        </div>
+
+        <!-- Indicador de más eventos -->
+        <div 
+          class="more-events" 
+          *ngIf="eventosDelDia(day).length > 1"
+        >
+          +{{ eventosDelDia(day).length - 1 }}
+        </div>
       </div>
 
     </div>
   </div>
 
+</div>
+
+<!-- Modal para crear evento -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h3>Crear Evento - {{ fechaSeleccionada | date:'fullDate':'':'es' }}</h3>
+      <button class="close-btn" (click)="cerrarModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <!-- Eventos existentes -->
+      <div class="eventos-existente" *ngIf="eventosDelDiaSeleccionado.length > 0">
+        <h4>Eventos existentes ({{ eventosDelDiaSeleccionado.length }})</h4>
+        <div class="evento-item" *ngFor="let evento of eventosDelDiaSeleccionado">
+          <div class="evento-info">
+            <strong>{{ evento.titulo }}</strong>
+            <span class="evento-hora">{{ evento.fecha_hora | date:'shortTime' }}</span>
+          </div>
+          <p *ngIf="evento.descripcion" class="evento-desc">{{ evento.descripcion }}</p>
+        </div>
+      </div>
+
+      <!-- Formulario para crear evento -->
+      <form (ngSubmit)="crearEvento()" #eventoForm="ngForm" class="evento-form">
+        
+        <div class="form-group">
+          <label for="titulo">Título del Evento *</label>
+          <input 
+            type="text" 
+            id="titulo"
+            class="form-control"
+            [(ngModel)]="nuevoEvento.titulo"
+            name="titulo"
+            required
+            placeholder="Ej: Reunión familiar"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <textarea 
+            id="descripcion"
+            class="form-control"
+            [(ngModel)]="nuevoEvento.descripcion"
+            name="descripcion"
+            rows="3"
+            placeholder="Descripción opcional del evento..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="hora">Hora del Evento *</label>
+          <input 
+            type="time" 
+            id="hora"
+            class="form-control"
+            [(ngModel)]="nuevoEvento.hora"
+            name="hora"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="duracion">Duración (minutos)</label>
+          <select 
+            id="duracion"
+            class="form-control"
+            [(ngModel)]="nuevoEvento.duracion"
+            name="duracion"
+          >
+            <option value="30">30 minutos</option>
+            <option value="60" selected>1 hora</option>
+            <option value="90">1.5 horas</option>
+            <option value="120">2 horas</option>
+            <option value="180">3 horas</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="cerrarModal()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="!eventoForm.form.valid || creandoEvento"
+          >
+            <span *ngIf="creandoEvento" class="spinner"></span>
+            {{ creandoEvento ? 'Creando...' : 'Crear Evento' }}
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
 </div>

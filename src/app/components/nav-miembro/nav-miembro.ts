@@ -1,17 +1,15 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
-import { routes } from '../../app.routes';
-import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-nav',
-    imports: [RouterModule, CommonModule],
-  templateUrl: './nav.html',
-  styleUrls: ['./nav.css']
+  selector: 'app-nav-miembro',
+  imports: [RouterModule, CommonModule],
+  templateUrl: './nav-miembro.html',
+  styleUrls: ['./nav-miembro.css']
 })
-export class NavComponent {
-
+export class NavMiembroComponent {
   userName = 'Alex';
   userMenuOpen = false;
   mobileMenuOpen = false;

@@ -24,9 +24,6 @@
   transform: scale(1.05);
 }
 
-/* person icon */
-
-
 .logo-icon {
   width: 32px;
   height: 32px;
@@ -451,8 +448,6 @@
     padding: 8px !important;
   }
 }
-
-
 
 /* Móviles pequeños (480px o menos) */
 @media (max-width: 480px) {
