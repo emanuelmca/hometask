@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
 
@@ -36,9 +35,9 @@ interface UserPerformanceData {
 @Component({
     selector: 'app-admin-reports',
     standalone: true,
-    imports: [CommonModule, RouterLink, NavComponent, ChatFloatingComponent],
+    imports: [CommonModule, NavComponent, ChatFloatingComponent],
     templateUrl: './admin-reports.html',
-    styleUrls: ['./admin-reports.css']
+    styleUrls: ['./admin-reports.css', './iframe-fullwidth.css']
 })
 export class AdminReportsComponent implements OnInit {
     // Activity data (last 7 days)

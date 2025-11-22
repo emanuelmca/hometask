@@ -1,0 +1,11 @@
+/* Full-screen iframe for Power BI */
+.iframe-fullwidth {
+    grid-column: 1 / -1 !important;
+    min-height: calc(100vh - 200px);
+    margin: 0;
+}
+
+.iframe-fullwidth .iframe-container {
+    height: calc(100vh - 250px);
+    min-height: 700px;
+}
