@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { NavComponent } from '../../components/nav/nav';
+import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
 
 // Interfaces
@@ -37,7 +38,7 @@ interface Tarea {
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavComponent, ChatFloatingComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavComponent, NavMiembroComponent, ChatFloatingComponent],
   templateUrl: './gestion-tareas.html',
   styleUrls: ['./gestion-tareas.css']
 })
@@ -47,6 +48,7 @@ export class TasksComponent implements OnInit {
   tareas: Tarea[] = [];
   miembros: Miembro[] = [];
   tareasFiltradas: Tarea[] = [];
+  isAdmin: boolean = false;
 
   // Estados
   loading = false;
@@ -77,8 +79,16 @@ export class TasksComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router) { }
 
   ngOnInit(): void {
+    this.verificarRol();
     this.cargarTareas();
     this.cargarMiembros();
+  }
+
+  // Verificar rol del usuario
+  verificarRol(): void {
+    const rolId = localStorage.getItem('rolId');
+    // rolId 1 = Administrador, rolId 2 = Hijo/Miembro
+    this.isAdmin = rolId === '1';
   }
 
   // Headers de autenticación

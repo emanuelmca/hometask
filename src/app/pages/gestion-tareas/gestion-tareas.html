@@ -1,4 +1,7 @@
-<app-nav></app-nav>
+<!-- Nav condicional según rol -->
+<app-nav *ngIf="isAdmin"></app-nav>
+<app-nav-miembro *ngIf="!isAdmin"></app-nav-miembro>
+
 
 <div class="tasks-container">
   <div class="container">

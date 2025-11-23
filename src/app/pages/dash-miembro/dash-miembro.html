@@ -4,7 +4,7 @@
   <div class="dashboard-container">
     <!-- Header -->
     <div class="dashboard-header">
-      <h1>Buenos días, Alex</h1>
+      <h1>Buenos días, {{ memberName }}</h1>
       <p>Aquí tienes un resumen de tu hogar para hoy.</p>
     </div>
 
@@ -15,16 +15,32 @@
         <!-- Mis Tareas Hoy -->
         <div class="card tasks-card">
           <h2>Mis Tareas Hoy</h2>
-          <div class="tasks-list">
-            <div class="task-item" *ngFor="let task of tasks">
-              <label class="task-checkbox">
-                <input type="checkbox" [checked]="task.completed" (change)="toggleTask(task.id)">
-                <span class="checkmark"></span>
-              </label>
+          <div class="loading" *ngIf="loading">Cargando tareas...</div>
+          <div class="error" *ngIf="error">{{ error }}</div>
+          <div class="tasks-list" *ngIf="!loading && !error">
+            <div class="task-item" 
+                 *ngFor="let task of tasks" 
+                 (click)="goToTaskDetail(task.id)"
+                 [class.completed]="isTaskCompleted(task)"
+                 style="cursor: pointer;">
               <div class="task-content">
-                <span class="task-text" [class.completed]="task.completed">{{ task.title }}</span>
-                <span class="task-tag urgent" *ngIf="task.urgent">Urgente</span>
+                <span class="task-text" [class.completed]="isTaskCompleted(task)">
+                  {{ task.titulo }}
+                </span>
+                <span class="task-description" *ngIf="task.descripcion">
+                  {{ task.descripcion }}
+                </span>
+                <div class="task-meta">
+                  <span class="task-tag urgent" *ngIf="isTaskUrgent(task)">Urgente</span>
+                  <span class="task-tag" [class]="task.estado">{{ task.estado }}</span>
+                  <span class="task-date" *ngIf="task.fecha_vencimiento">
+                    {{ formatDate(task.fecha_vencimiento) }}
+                  </span>
+                </div>
               </div>
+            </div>
+            <div class="empty-state" *ngIf="tasks.length === 0">
+              <p>No tienes tareas asignadas para hoy</p>
             </div>
           </div>
         </div>
@@ -33,12 +49,16 @@
         <div class="card events-card">
           <h2>Próximos Eventos</h2>
           <div class="events-list">
-            <div class="event-item" *ngFor="let event of events">
-              <div class="event-number">{{ event.number }}</div>
+            <div class="event-item" *ngFor="let event of events; let i = index">
+              <div class="event-number">{{ getEventNumber(i) }}</div>
               <div class="event-content">
-                <span class="event-text" [class.completed]="event.completed">{{ event.title }}</span>
-                <span class="event-date">{{ event.date }}</span>
+                <span class="event-text">{{ event.titulo }}</span>
+                <span class="event-description" *ngIf="event.descripcion">{{ event.descripcion }}</span>
+                <span class="event-date">{{ formatDate(event.fecha) }} - {{ event.hora }}</span>
               </div>
+            </div>
+            <div class="empty-state" *ngIf="events.length === 0">
+              <p>No hay eventos próximos</p>
             </div>
           </div>
         </div>

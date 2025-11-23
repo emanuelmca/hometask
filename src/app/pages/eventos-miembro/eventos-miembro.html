@@ -1,0 +1,141 @@
+<app-nav-miembro></app-nav-miembro>
+
+<div class="eventos-container">
+  <div class="eventos-header">
+    <h1>Eventos del Hogar</h1>
+    <p>Gestiona y visualiza todos los eventos familiares</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando eventos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+    </svg>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Bento Grid Layout -->
+  <div class="bento-grid" *ngIf="!loading && !error">
+    
+    <!-- Calendar Card (Large) -->
+    <div class="bento-card calendar-card">
+      <div class="card-header">
+        <h2>Calendario</h2>
+        <div class="calendar-controls">
+          <button class="control-btn" (click)="previousMonth()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+          </button>
+          <span class="current-month">{{ getCurrentMonthYear() }}</span>
+          <button class="control-btn" (click)="nextMonth()">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="calendar">
+        <!-- Day Names -->
+        <div class="calendar-header">
+          <div class="day-name" *ngFor="let day of dayNames">{{ day }}</div>
+        </div>
+
+        <!-- Calendar Days -->
+        <div class="calendar-body">
+          <div 
+            class="calendar-day" 
+            *ngFor="let day of calendarDays"
+            [class.other-month]="!day.isCurrentMonth"
+            [class.today]="day.isToday"
+            [class.has-events]="day.hasEvents"
+            [class.selected]="selectedDate && formatDateForComparison(selectedDate) === formatDateForComparison(day.date)"
+            (click)="selectDate(day)">
+            <span class="day-number">{{ day.day }}</span>
+            <div class="event-indicator" *ngIf="day.hasEvents">
+              <span class="event-dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events List Card -->
+    <div class="bento-card events-list-card">
+      <div class="card-header">
+        <h2>
+          <span *ngIf="!selectedDate">Todos los Eventos</span>
+          <span *ngIf="selectedDate">Eventos del {{ formatEventDate(selectedDate.toISOString()) }}</span>
+        </h2>
+        <button class="reset-btn" *ngIf="selectedDate" (click)="resetFilter()">
+          Ver todos
+        </button>
+      </div>
+
+      <div class="events-list">
+        <!-- Event Items -->
+        <div class="event-item" *ngFor="let evento of filteredEvents">
+          <div class="event-time">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+              <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+            </svg>
+            <span>{{ formatEventTime(evento.fecha_hora) }}</span>
+          </div>
+          
+          <div class="event-content">
+            <h3 class="event-title">{{ evento.titulo }}</h3>
+            <p class="event-description" *ngIf="evento.descripcion">{{ evento.descripcion }}</p>
+            
+            <div class="event-meta">
+              <span class="event-date">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+                </svg>
+                {{ formatEventDate(evento.fecha_hora) }}
+              </span>
+              <span class="event-duration">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                  <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                </svg>
+                {{ formatDuration(evento.duracion_min) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-events" *ngIf="filteredEvents.length === 0">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
+          </svg>
+          <p>No hay eventos para mostrar</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="bento-card stats-card">
+      <h3>Resumen</h3>
+      <div class="stat-item">
+        <span class="stat-label">Total de Eventos</span>
+        <span class="stat-value">{{ eventos.length }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Este Mes</span>
+        <span class="stat-value">{{ filteredEvents.length }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<app-chat-floating></app-chat-floating>

@@ -1,22 +1,27 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { CommonModule } from '@angular/common';
 import { ChatFloatingComponent } from "../../components/chat-floating/chat-floating";
-
+import { DashboardService } from '../../service/dashboard.service';
 
 interface Task {
   id: number;
-  title: string;
-  completed: boolean;
-  urgent: boolean;
+  titulo: string;
+  descripcion: string;
+  estado: string;
+  prioridad: string;
+  fecha_vencimiento: string;
+  categoria?: string;
 }
 
 interface Event {
   id: number;
-  number: string;
-  title: string;
-  date: string;
-  completed: boolean;
+  titulo: string;
+  descripcion: string;
+  fecha: string;
+  hora: string;
+  estado: string;
 }
 
 interface ShoppingItem {
@@ -32,18 +37,12 @@ interface ShoppingItem {
   styleUrls: ['./dash-miembro.css']
 })
 export class MemberDashboardComponent implements OnInit {
-  
-  tasks: Task[] = [
-    { id: 1, title: 'Sacar la basura', completed: false, urgent: true },
-    { id: 2, title: 'Pasear al perro', completed: false, urgent: true },
-    { id: 3, title: 'Llamar al fontanero', completed: false, urgent: true },
-    { id: 4, title: 'Preparar la cena para las 20h', completed: false, urgent: false }
-  ];
 
-  events: Event[] = [
-    { id: 1, number: '1', title: 'Cena con los abuelos', date: 'Hoy, 2000h', completed: false },
-    { id: 2, number: '2', title: 'Partido de fútbol de Leo', date: 'Mañana, 1100h', completed: true }
-  ];
+  tasks: Task[] = [];
+  events: Event[] = [];
+  loading: boolean = true;
+  error: string = '';
+  memberName: string = 'Usuario';
 
   shoppingList: ShoppingItem[] = [
     { id: 1, name: 'Leche', completed: false },
@@ -52,16 +51,79 @@ export class MemberDashboardComponent implements OnInit {
     { id: 4, name: 'Aguacates', completed: false }
   ];
 
-  constructor() { }
+  constructor(
+    private dashboardService: DashboardService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    this.loadMemberName();
+    this.loadDashboardData();
   }
 
-  toggleTask(taskId: number): void {
-    const task = this.tasks.find(t => t.id === taskId);
-    if (task) {
-      task.completed = !task.completed;
+  // Cargar nombre del miembro desde la API
+  loadMemberName(): void {
+    const idHogar = localStorage.getItem('id_hogar');
+    const idMiembro = localStorage.getItem('id_miembro');
+
+    if (!idHogar || !idMiembro) {
+      console.error('No se encontró id_hogar o id_miembro en localStorage');
+      return;
     }
+
+    this.dashboardService.getMiembrosHogar(parseInt(idHogar)).subscribe({
+      next: (miembros: any[]) => {
+        const miembroActual = miembros.find(m => m.id === parseInt(idMiembro));
+        if (miembroActual) {
+          this.memberName = miembroActual.nombre_completo;
+          console.log('✅ Nombre del miembro cargado:', this.memberName);
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar datos del miembro:', error);
+      }
+    });
+  }
+
+  loadDashboardData(): void {
+    this.loading = true;
+
+    // Cargar tareas del miembro
+    this.dashboardService.getMisTareas().subscribe({
+      next: (response) => {
+        console.log('Tareas recibidas:', response);
+        this.tasks = response.tareas || response || [];
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar tareas:', error);
+        this.error = 'Error al cargar las tareas';
+        this.loading = false;
+      }
+    });
+
+    // Cargar eventos activos
+    this.dashboardService.getEventosActivos().subscribe({
+      next: (response) => {
+        console.log('Eventos recibidos:', response);
+        this.events = response.eventos || response || [];
+      },
+      error: (error) => {
+        console.error('Error al cargar eventos:', error);
+      }
+    });
+  }
+
+  isTaskUrgent(task: Task): boolean {
+    return task.prioridad === 'alta' || task.prioridad === 'urgente';
+  }
+
+  isTaskCompleted(task: Task): boolean {
+    return task.estado === 'completada' || task.estado === 'finalizada';
+  }
+
+  goToTaskDetail(taskId: number): void {
+    this.router.navigate(['/task', taskId]);
   }
 
   toggleShoppingItem(itemId: number): void {
@@ -71,10 +133,23 @@ export class MemberDashboardComponent implements OnInit {
     }
   }
 
-  toggleEvent(eventId: number): void {
-    const event = this.events.find(e => e.id === eventId);
-    if (event) {
-      event.completed = !event.completed;
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Hoy';
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return 'Mañana';
+    } else {
+      return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
     }
+  }
+
+  getEventNumber(index: number): string {
+    return (index + 1).toString();
   }
 }

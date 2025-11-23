@@ -12,7 +12,7 @@ import { MemberDashboardComponent } from './pages/dash-miembro/dash-miembro';
 import { TaskDetailComponent } from './pages/task-detail/task-detail';
 import { MessagingComponent } from './pages/messaging/messaging';
 import { AssistantChatComponent } from './pages/assistant-chat/assistant-chat';
-
+import { EventosMiembroComponent } from './pages/eventos-miembro/eventos-miembro';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -27,5 +27,6 @@ export const routes: Routes = [
   { path: 'messages/:memberId', component: MessagingComponent, canActivate: [MemberGuard] },
   { path: 'assistant', component: AssistantChatComponent, canActivate: [MemberGuard] },
   { path: 'admin/reports', component: AdminReportsComponent, canActivate: [MemberGuard] },
+  { path: 'eventos-miembro', component: EventosMiembroComponent, canActivate: [MemberGuard] },
   { path: '**', redirectTo: '/login' }
 ];
