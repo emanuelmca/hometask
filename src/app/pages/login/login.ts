@@ -35,47 +35,56 @@ export class Login {
       contrasena: this.contrasena
     };
 
+    console.log('📤 [Login] Enviando solicitud:', { ...payload, contrasena: '***' });
+
     this.http.post<any>('http://127.0.0.1:8000/auth/login', payload).subscribe({
       next: (response) => {
+        console.log('✅ [Login] Respuesta recibida:', response);
         const token = response.access_token;
 
-        const decoded = this.decodeToken(token);
-        const rol = decoded?.rol;
+        // El rol viene directamente en la respuesta, no en el token decodificado
+        const rolObj = response.rol;
+        const rolId = rolObj?.id;
+        const rolNombre = rolObj?.nombre;
 
+        console.log('👤 [Login] Rol detectado:', { id: rolId, nombre: rolNombre });
 
-        localStorage.setItem('rol_usuario', rol);
+        // Guardar rol_usuario (nombre) para compatibilidad y uso en UI
+        if (rolNombre) {
+          localStorage.setItem('rol_usuario', rolNombre);
+        }
 
+        // Guardar IDs usando AuthService
+        this.authService.setToken(token);
+
+        if (rolId) {
+          this.authService.setRoleId(rolId);
+        } else {
+          console.warn('⚠️ No se encontró rol.id en la respuesta.');
+        }
+
+        // id_miembro y id_hogar vienen en la respuesta del login
         const miembroId = response.id_miembro;
         const idHogar = response.id_hogar;
 
-        this.authService.setToken(token);
-        localStorage.setItem('id_hogar', idHogar);
-        localStorage.setItem('id_miembro', miembroId);
+        this.authService.setMemberId(miembroId);
+        this.authService.setHomeId(idHogar);
 
-
-        const headers = new HttpHeaders({
-          Authorization: `Bearer ${token}`
-        });
-
-
-        const nombre = localStorage.getItem('rol_usuario') || 'Usuario';
-        this.authService.setUserName(nombre);
-
+        // Usar el nombre del rol como nombre de usuario por ahora (según lógica anterior)
+        this.authService.setUserName(rolNombre || 'Usuario');
 
         this.loading = false;
-        this.successMessage = `Bienvenido, ${nombre}`;
+        this.successMessage = `Bienvenido, ${rolNombre}`;
 
         // ⬇️ Redirección según rol
         setTimeout(() => {
-
-          if (rol === "Administrador") {
+          if (rolNombre === "Administrador") {
             this.router.navigate(['/dashboard']);
           }
           else {
             console.log("Redirigiendo a dash-miembro");
             this.router.navigate(['/dash-miembro']);
           }
-
         }, 1500);
 
       },
@@ -87,7 +96,6 @@ export class Login {
     });
   }
 
-
   decodeToken(token: string): any {
     try {
       const payload = token.split('.')[1];
@@ -97,6 +105,4 @@ export class Login {
       return null;
     }
   }
-
-
 }

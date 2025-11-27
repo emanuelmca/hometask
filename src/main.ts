@@ -6,6 +6,7 @@ import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 registerLocaleData(localeEs);
 
@@ -13,6 +14,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     importProvidersFrom(HttpClientModule),
-     { provide: LOCALE_ID, useValue: 'es' }
+    provideAnimations(),
+    { provide: LOCALE_ID, useValue: 'es' }
   ]
 }).catch(err => console.error(err));

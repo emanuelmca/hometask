@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { CalendarComponent } from '../../components/calendar/calendar';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 // -------------------------------------------------------------------
 // 1. Interfaces para el tipado de datos
@@ -66,7 +67,8 @@ interface Tarea {
     HttpClientModule,
     CalendarComponent,
     NavComponent,
-    ChatFloatingComponent 
+    ChatFloatingComponent,
+    VirtualAssistantFabComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']

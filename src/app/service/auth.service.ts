@@ -29,6 +29,37 @@ export class AuthService {
     return localStorage.getItem('nombre_usuario') || 'Invitado';
   }
 
+  setRoleId(id: number | undefined | null) {
+    if (id !== undefined && id !== null) {
+      localStorage.setItem('rol_id', id.toString());
+    } else {
+      console.warn('⚠️ [AuthService] Intentando guardar rol_id nulo o indefinido.');
+    }
+  }
+
+  getRoleId(): number {
+    const id = localStorage.getItem('rol_id');
+    return id ? parseInt(id, 10) : 0;
+  }
+
+  setMemberId(id: number) {
+    localStorage.setItem('id_miembro', id.toString());
+  }
+
+  getMemberId(): number {
+    const id = localStorage.getItem('id_miembro');
+    return id ? parseInt(id, 10) : 0;
+  }
+
+  setHomeId(id: number) {
+    localStorage.setItem('id_hogar', id.toString());
+  }
+
+  getHomeId(): number {
+    const id = localStorage.getItem('id_hogar');
+    return id ? parseInt(id, 10) : 0;
+  }
+
   clearUserData() {
     localStorage.clear();
     this.userNameSource.next('Invitado');

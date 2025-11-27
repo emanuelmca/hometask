@@ -29,7 +29,7 @@ interface Event {
 
 @Component({
   selector: 'app-member-dashboard',
-  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent],
+  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent, CalendarLateralComponent],
   templateUrl: './dash-miembro.html',
   styleUrls: ['./dash-miembro.css']
 })

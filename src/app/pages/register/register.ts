@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.html',
   styleUrls: ['./register.css']
 })
@@ -28,42 +28,45 @@ export class RegisterComponent {
   });
 
   onSubmit() {
-  if (this.registerForm.invalid) {
-    this.message = 'Completa todos los campos correctamente';
-    return;
-  }
-
-  this.loading = true;
-
-  const data = {
-    ...this.registerForm.value,
-    id_rol: Number(1)
-  
-  } as any;
-
-  this.authService.registrar(data).subscribe({
-    next: (resp) => {
-      this.loading = false;
-
-      // Guardar token e info
-      localStorage.setItem('token', resp.access_token);
-      localStorage.setItem('id_hogar', resp.id_hogar.toString());
-      localStorage.setItem('id_miembro', resp.id_miembro.toString());
-
-      this.message = 'Registro exitoso';
-
-      setTimeout(() => {
-        this.router.navigate(['/login']);
-      }, 1000);
-    },
-    error: (err) => {
-      this.loading = false;
-      console.error(err);
-
-      // Capturamos mensaje del backend si viene:
-      this.message = err.error?.detail || 'Error al registrar. Revisa los datos.';
+    if (this.registerForm.invalid) {
+      this.message = 'Completa todos los campos correctamente';
+      return;
     }
-  });
-}
+
+    this.loading = true;
+
+    const data = {
+      ...this.registerForm.value,
+      id_rol: Number(1)
+    } as any;
+
+    console.log('📤 [Register] Enviando solicitud:', { ...data, contrasena: '***' });
+
+    this.authService.registrar(data).subscribe({
+      next: (resp) => {
+        console.log('✅ [Register] Respuesta recibida:', resp);
+        this.loading = false;
+
+        // Guardar token e info
+        localStorage.setItem('token', resp.access_token);
+        localStorage.setItem('id_hogar', resp.id_hogar.toString());
+        localStorage.setItem('id_miembro', resp.id_miembro.toString());
+
+        this.message = 'Registro exitoso';
+
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('❌ [Register] Error:', err);
+        this.loading = false;
+        console.error(err);
+
+        // Capturamos mensaje del backend si viene:
+        this.message = err.error?.detail || 'Error al registrar. Revisa los datos.';
+      }
+    });
+  }
 
 }

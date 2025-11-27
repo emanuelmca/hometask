@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 export interface Bubble {
     from: 'assistant' | 'user';
@@ -34,9 +35,14 @@ export interface AssistantRequest {
 export class AssistantService {
     private apiUrl = 'http://localhost:8000/assistant/agent';
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private authService: AuthService) { }
 
     sendMessage(request: AssistantRequest): Observable<AssistantResponse> {
-        return this.http.post<AssistantResponse>(this.apiUrl, request);
+        const token = this.authService.getToken();
+        let headers = new HttpHeaders();
+        if (token) {
+            headers = headers.set('Authorization', `Bearer ${token}`);
+        }
+        return this.http.post<AssistantResponse>(this.apiUrl, request, { headers });
     }
 }

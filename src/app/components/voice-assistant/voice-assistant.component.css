@@ -328,7 +328,7 @@
 /* ========== PANEL DE RESPUESTA (PREMIUM GLASS) ========== */
 .response-panel {
     position: absolute;
-    bottom: 100px;
+    bottom: 160px;
     right: 0;
     width: 380px;
     max-height: 500px;

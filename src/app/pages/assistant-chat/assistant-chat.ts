@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AssistantService, Bubble, Action, AssistantResponse } from '../../service/assistant.service';
 import { Location } from '@angular/common';
+import { AuthService } from '../../service/auth.service';
 
 interface ChatMessage {
     type: 'bubble' | 'bullets' | 'actions';
@@ -34,17 +35,18 @@ export class AssistantChatComponent implements OnInit, AfterViewChecked {
 
     constructor(
         private assistantService: AssistantService,
+        private authService: AuthService,
         private router: Router,
         private location: Location
     ) { }
 
     ngOnInit() {
-        // Get auth info from localStorage
-        const miembroIdStr = localStorage.getItem('id_miembro');
-        const rolIdStr = localStorage.getItem('rol_usuario');
+        // Get auth info from AuthService
+        this.miembroId = this.authService.getMemberId();
+        this.rolId = this.authService.getRoleId();
 
-        this.miembroId = miembroIdStr ? parseInt(miembroIdStr) : 0;
-        this.rolId = rolIdStr && !isNaN(Number(rolIdStr)) ? parseInt(rolIdStr) : 2;
+        // Fallback if 0
+        if (this.rolId === 0) this.rolId = 2;
 
         // Initial greeting
         const greeting = '¡Hola! Soy tu asistente de gestión del hogar. Estoy aquí para ayudarte a organizar tareas, coordinar con miembros y mucho más. ¿En qué puedo ayudarte hoy?';
