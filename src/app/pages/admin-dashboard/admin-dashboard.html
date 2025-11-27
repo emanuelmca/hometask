@@ -7,7 +7,7 @@
     <div class="sidebar-tareas">
       <h3>Tareas</h3>
       <p>Control general del hogar.</p>
-      
+
       <!-- Lista de Tareas -->
       <div class="tareas-list" *ngIf="tareas.length > 0; else noTareas">
         <div class="tarea-item" *ngFor="let tarea of tareas | slice:0:5">
@@ -25,7 +25,7 @@
           </div>
         </div>
       </div>
-      
+
       <ng-template #noTareas>
         <p class="no-tareas-text">No hay tareas pendientes.</p>
       </ng-template>
@@ -64,14 +64,15 @@
           Total: {{ totalMiembros !== null ? totalMiembros : 'Cargando...' }}
         </p>
       </div>
-      <button class="button-group bg-indigo-500 hover:bg-indigo-600 mt-4" [routerLink]="['/members']">Ir a Miembros</button>
+      <button class="button-group bg-indigo-500 hover:bg-indigo-600 mt-4" [routerLink]="['/members']">Ir a
+        Miembros</button>
     </div>
 
     <!-- Hogares -->
     <div class="bento-item gradient-5">
       <h3>Hogar</h3>
       <p><strong>Nombre:</strong> {{ nombreHogar || 'Cargando...' }}</p>
-      <p><strong>Miembros:</strong> 
+      <p><strong>Miembros:</strong>
         {{ cantidadMiembros !== null ? cantidadMiembros : 'Cargando...' }}
       </p>
     </div>

@@ -1,0 +1,128 @@
+<div class="calendario-lateral" [class.colapsado]="colapsado">
+    <!-- Botón para expandir/colapsar - MEJORADO PARA RESPONSIVE -->
+    <button class="btn-toggle" (click)="toggleColapsado()"
+        [title]="colapsado ? 'Abrir calendario' : 'Cerrar calendario'"
+        [attr.aria-label]="colapsado ? 'Abrir calendario' : 'Cerrar calendario'">
+        <span *ngIf="!colapsado">✕</span>
+        <span *ngIf="colapsado">📅</span>
+    </button>
+
+    <!-- Encabezado del calendario -->
+    <div class="calendario-header" *ngIf="!colapsado">
+        <div class="fecha-controls">
+            <button class="btn-flecha" (click)="diaAnterior()" title="Día anterior" aria-label="Día anterior">
+                ‹
+            </button>
+
+            <div class="fecha-info">
+                <div class="fecha-principal">{{ formatearFecha(fechaSeleccionada) }}</div>
+                <div class="hoy-controls">
+                    <div class="hoy-indicator" *ngIf="esHoy(fechaSeleccionada)">Hoy</div>
+                    <button class="btn-hoy" *ngIf="!esHoy(fechaSeleccionada)" (click)="irAHoy()">
+                        Hoy
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn-flecha" (click)="diaSiguiente()" title="Día siguiente" aria-label="Día siguiente">
+                ›
+            </button>
+        </div>
+
+        <div class="header-actions">
+            <div class="zona-horaria">GMT-05</div>
+            <button class="btn-recargar" (click)="recargar()" title="Recargar datos" aria-label="Recargar datos">
+                ↻
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido del calendario -->
+    <div class="calendario-content" *ngIf="!colapsado">
+        <!-- Mensajes de estado -->
+        <div class="estado-mensajes">
+            <div class="error-mensaje" *ngIf="error">
+                {{ error }}
+                <button class="btn-reintentar" (click)="recargar()">Reintentar</button>
+            </div>
+
+            <div class="token-mensaje" *ngIf="!tieneToken()">
+                ⚠️ No hay token de autenticación
+            </div>
+        </div>
+
+        <div class="loading" *ngIf="cargando">
+            <div class="loading-spinner"></div>
+            Cargando actividades...
+        </div>
+
+        <div class="timeline" *ngIf="!cargando && tieneToken()">
+            <!-- Línea de tiempo con horas - ADAPTATIVA -->
+            <div class="timeline-hours">
+                <div class="hora-item" *ngFor="let hora of generarHoras()"
+                    [class.hora-actual]="esHoraActual(hora.hora)">
+                    <div class="hora-label">{{ hora.formato }}</div>
+                    <div class="hora-linea"></div>
+                </div>
+            </div>
+
+            <!-- Contenedor de eventos y tareas -->
+            <div class="eventos-container">
+                <!-- Líneas horizontales para cada hora (solo en desktop) -->
+                <div class="lineas-horarias">
+                    <div class="linea-hora" *ngFor="let hora of generarHoras()"
+                        [class.hora-actual]="esHoraActual(hora.hora)"></div>
+                </div>
+
+                <!-- Eventos posicionados sin superposición -->
+                <div class="evento-item" *ngFor="let eventoPos of eventosPosicionados" [style.top.px]="eventoPos.top"
+                    [style.height.px]="eventoPos.height" [style.left.%]="eventoPos.left"
+                    [style.width.%]="eventoPos.width" [class.evento-activo]="eventoPos.evento.estado"
+                    [class.evento-inactivo]="!eventoPos.evento.estado" [class.evento-solapado]="eventoPos.solapado"
+                    [title]="eventoPos.evento.descripcion || eventoPos.evento.titulo"
+                    [attr.aria-label]="'Evento: ' + eventoPos.evento.titulo">
+
+                    <div class="evento-content">
+                        <div class="evento-titulo">{{ eventoPos.evento.titulo }}</div>
+                        <div class="evento-hora">
+                            {{ formatearHoraEvento(eventoPos.evento.fecha_hora, eventoPos.evento.duracion_min) }}
+                        </div>
+                        <div class="evento-descripcion" *ngIf="eventoPos.evento.descripcion">
+                            {{ eventoPos.evento.descripcion }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas distribuidas sin superposición -->
+                <div class="tareas-container">
+                    <div class="hora-slot" *ngFor="let hora of generarHoras(); let i = index"
+                        [class.hora-actual]="esHoraActual(hora.hora)">
+
+                        <!-- Tareas para esta hora -->
+                        <div class="tarea-item" *ngFor="let tarea of obtenerTareasPorHora(hora.hora); let first = first"
+                            [class.primera-tarea]="first" [class.segunda-tarea]="!first"
+                            [class.pendiente]="tarea.estado_actual === 'pendiente'"
+                            [class.en-progreso]="tarea.estado_actual === 'en_progreso'"
+                            [class.completada]="tarea.estado_actual === 'completada'"
+                            [title]="tarea.descripcion || tarea.titulo" [attr.aria-label]="'Tarea: ' + tarea.titulo">
+
+                            <div class="tarea-content">
+                                <div class="tarea-header">
+                                    <div class="tarea-titulo">{{ tarea.titulo }}</div>
+                                    <div class="tarea-categoria">{{ tarea.categoria }}</div>
+                                </div>
+                                <div class="tarea-estado">{{ tarea.estado_actual }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje cuando no hay actividades -->
+        <div class="sin-actividades"
+            *ngIf="!cargando && tieneToken() && obtenerActividadesDelDia().tareas.length === 0 && obtenerActividadesDelDia().eventos.length === 0">
+            No hay actividades para {{ formatearFecha(fechaSeleccionada) }}
+        </div>
+    </div>
+</div>

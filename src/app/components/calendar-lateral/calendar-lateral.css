@@ -1,0 +1,996 @@
+.calendario-lateral {
+    position: fixed;
+    right: -0px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: #ffffff;
+    border-left: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    margin-top: 60px;
+    height: calc(100vh - 60px);
+}
+
+/* Estado colapsado */
+.calendario-lateral.colapsado {
+    width: 0;
+    /* transform: translateX(340px); REMOVED: This was pushing it off-screen in desktop */
+}
+
+.calendario-lateral.colapsado .calendario-content,
+.calendario-lateral.colapsado .calendario-header {
+    display: none;
+}
+
+/* Botón toggle - posición corregida */
+.btn-toggle {
+    position: absolute;
+    left: -40px;
+    top: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px 0 0 6px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 1001;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Cuando está colapsado en DESKTOP, el botón se posiciona DENTRO del calendario */
+.calendario-lateral.colapsado .btn-toggle {
+    right: 0px;
+    /* Dentro del área de 60px */
+    background: #7b887e;
+    border-radius: 6px;
+}
+
+.btn-toggle:hover {
+    background: #0056b3;
+}
+
+.calendario-lateral.colapsado .btn-toggle:hover {
+    background: #218838;
+}
+
+.calendario-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    flex-shrink: 0;
+}
+
+.fecha-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.btn-flecha {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #666;
+    transition: all 0.2s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-flecha:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    transform: translateY(-1px);
+}
+
+.fecha-info {
+    text-align: center;
+    flex: 1;
+    margin: 0 15px;
+}
+
+.fecha-principal {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.hoy-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.hoy-indicator {
+    font-size: 12px;
+    color: #007bff;
+    font-weight: 500;
+    padding: 4px 8px;
+    background: #e3f2fd;
+    border-radius: 12px;
+}
+
+.btn-hoy {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-hoy:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zona-horaria {
+    font-size: 12px;
+    color: #666;
+}
+
+.btn-recargar {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.btn-recargar:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    transform: rotate(90deg);
+}
+
+.estado-mensajes {
+    padding: 10px 20px;
+    flex-shrink: 0;
+}
+
+.error-mensaje {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-reintentar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.token-mensaje {
+    background: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.calendario-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #666;
+    font-size: 14px;
+    gap: 12px;
+}
+
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.timeline {
+    display: flex;
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    overflow-y: auto;
+    /* SCROLL SYNC: Scroll on parent */
+    overflow-x: hidden;
+}
+
+.timeline-hours {
+    width: 80px;
+    border-right: 1px solid #f0f0f0;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+
+.hora-item {
+    height: 60px;
+    display: flex;
+    align-items: flex-start;
+    padding: 4px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    position: relative;
+}
+
+.hora-item.hora-actual {
+    background: #fff8e1;
+}
+
+.hora-item.hora-actual .hora-label {
+    color: #ff9800;
+    font-weight: 600;
+}
+
+.hora-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.hora-linea {
+    position: absolute;
+    left: 80px;
+    right: 0;
+    top: 100%;
+    height: 1px;
+    background: #f0f0f0;
+}
+
+.eventos-container {
+    flex: 1;
+    position: relative;
+    background: white;
+    overflow: visible;
+    /* SCROLL SYNC: No internal scroll */
+    min-height: 0;
+    height: auto;
+    /* Allow growth */
+}
+
+.lineas-horarias {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.linea-hora {
+    height: 60px;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.linea-hora.hora-actual {
+    border-bottom: 2px solid #ff9800;
+    background: rgba(255, 152, 0, 0.05);
+}
+
+/* Eventos con posicionamiento inteligente */
+.evento-item {
+    position: absolute;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-height: 40px;
+    z-index: 2;
+}
+
+.evento-activo {
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+}
+
+.evento-inactivo {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    opacity: 0.7;
+}
+
+.evento-solapado {
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+}
+
+.evento-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 3;
+}
+
+.evento-content {
+    font-size: 11px;
+}
+
+.evento-titulo {
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.evento-activo .evento-titulo {
+    color: #1565c0;
+}
+
+.evento-inactivo .evento-titulo {
+    color: #666;
+}
+
+.evento-solapado .evento-titulo {
+    color: #c62828;
+}
+
+.evento-hora {
+    font-size: 10px;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.evento-activo .evento-hora {
+    color: #1976d2;
+}
+
+.evento-inactivo .evento-hora {
+    color: #999;
+}
+
+.evento-solapado .evento-hora {
+    color: #d32f2f;
+}
+
+.evento-descripcion {
+    color: #424242;
+    font-size: 10px;
+    line-height: 1.2;
+    opacity: 0.8;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Tareas con distribución mejorada */
+.tareas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.hora-slot {
+    height: 60px;
+    position: relative;
+    pointer-events: all;
+}
+
+.hora-slot.hora-actual {
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.tarea-item {
+    position: absolute;
+    background: white;
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #ddd;
+    pointer-events: all;
+    max-width: 45%;
+}
+
+.tarea-item.primera-tarea {
+    left: 2%;
+    width: 45%;
+}
+
+.tarea-item.segunda-tarea {
+    left: 52%;
+    width: 45%;
+}
+
+.tarea-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.tarea-item.pendiente {
+    border-left-color: #ff9800;
+}
+
+.tarea-item.en-progreso {
+    border-left-color: #2196f3;
+}
+
+.tarea-item.completada {
+    border-left-color: #4caf50;
+    opacity: 0.8;
+}
+
+.tarea-content {
+    color: #333;
+}
+
+.tarea-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2px;
+}
+
+.tarea-titulo {
+    font-weight: 600;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+}
+
+.tarea-categoria {
+    font-size: 8px;
+    color: #666;
+    background: #f5f5f5;
+    padding: 1px 4px;
+    border-radius: 8px;
+    margin-left: 4px;
+    white-space: nowrap;
+}
+
+.tarea-estado {
+    font-size: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.tarea-item.pendiente .tarea-estado {
+    color: #ff9800;
+}
+
+.tarea-item.en-progreso .tarea-estado {
+    color: #2196f3;
+}
+
+.tarea-item.completada .tarea-estado {
+    color: #4caf50;
+}
+
+.sin-actividades {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Scroll personalizado */
+.eventos-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.eventos-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.eventos-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.eventos-container::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ============================ */
+/* RESPONSIVE DESIGN */
+/* ============================ */
+
+/* Tablets grandes y laptops pequeños (1024px - 1200px) */
+@media (max-width: 1200px) {
+    .calendario-lateral {
+        width: 350px;
+    }
+
+    .calendario-lateral.colapsado {
+        transform: translateX(290px);
+    }
+
+    .timeline-hours {
+        width: 70px;
+    }
+
+    .hora-label {
+        font-size: 11px;
+    }
+
+    .evento-content {
+        font-size: 10px;
+    }
+
+    .evento-titulo {
+        font-size: 10px;
+    }
+}
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .calendario-lateral {
+        width: 320px;
+    }
+
+    .calendario-lateral.colapsado {
+        transform: translateX(260px);
+    }
+
+    .calendario-header {
+        padding: 15px;
+    }
+
+    .fecha-principal {
+        font-size: 16px;
+    }
+
+    .timeline-hours {
+        width: 60px;
+    }
+
+    .hora-item {
+        height: 50px;
+        padding: 3px 6px;
+    }
+
+    .hora-label {
+        font-size: 10px;
+    }
+
+    .evento-item {
+        padding: 6px;
+        min-height: 35px;
+    }
+
+    .tarea-item {
+        padding: 4px;
+        font-size: 9px;
+    }
+
+    .tarea-titulo {
+        font-size: 9px;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (600px - 768px) */
+@media (max-width: 768px) {
+    .calendario-lateral {
+        width: 90%;
+        max-width: 400px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        margin-top: 0;
+        height: 100vh;
+        z-index: 10000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Cuando NO está colapsado - se muestra */
+    .calendario-lateral:not(.colapsado) {
+        transform: translateX(0);
+    }
+
+    /* Cuando SÍ está colapsado - se oculta pero el botón queda visible */
+    .calendario-lateral.colapsado {
+        width: auto;
+        transform: translateX(calc(100% - 50px));
+        /* Deja el botón visible */
+        background: transparent;
+        border-left: none;
+        box-shadow: none;
+    }
+
+    /* Botón toggle en móvil - SIEMPRE VISIBLE */
+    .btn-toggle {
+        position: fixed;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px 0 0 6px;
+        padding: 15px 8px;
+        cursor: pointer;
+        font-size: 18px;
+        z-index: 10001;
+        width: 50px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    /* Cuando el calendario está ABIERTO, el botón se posiciona dentro */
+    .calendario-lateral:not(.colapsado) .btn-toggle {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        right: auto;
+        transform: none;
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        border: 1px solid #ddd;
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .calendario-header {
+        padding: 15px 20px;
+        padding-top: 70px;
+        /* Espacio para el botón toggle */
+    }
+
+    .fecha-controls {
+        margin-bottom: 15px;
+    }
+
+    .fecha-principal {
+        font-size: 20px;
+    }
+
+    .timeline {
+        flex-direction: column;
+        height: calc(100vh - 200px);
+        overflow-y: hidden;
+        /* SCROLL SYNC: Revert for mobile */
+    }
+
+    .timeline-hours {
+        width: 100%;
+        height: auto;
+        max-height: 120px;
+        border-right: none;
+        border-bottom: 1px solid #f0f0f0;
+        overflow-x: auto;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .hora-item {
+        height: auto;
+        width: 80px;
+        flex-shrink: 0;
+        border-bottom: none;
+        border-right: 1px solid #f0f0f0;
+        padding: 8px 4px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hora-linea {
+        display: none;
+    }
+
+    .hora-label {
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .eventos-container {
+        flex: 1;
+        height: calc(100% - 120px);
+        overflow-y: auto;
+        /* SCROLL SYNC: Revert for mobile */
+    }
+
+    .lineas-horarias {
+        display: none;
+    }
+
+    /* Eventos en móvil */
+    .evento-item {
+        position: relative;
+        width: 95% !important;
+        left: 2.5% !important;
+        margin-bottom: 5px;
+        min-height: 50px;
+    }
+
+    .evento-content {
+        font-size: 12px;
+    }
+
+    .evento-titulo {
+        font-size: 13px;
+    }
+
+    /* Tareas en móvil */
+    .tareas-container {
+        position: relative;
+        height: auto;
+    }
+
+    .hora-slot {
+        height: auto;
+        min-height: 60px;
+        padding: 5px 0;
+    }
+
+    .tarea-item {
+        position: relative;
+        width: 95% !important;
+        left: 2.5% !important;
+        max-width: none;
+        margin-bottom: 5px;
+        font-size: 11px;
+    }
+
+    .tarea-item.primera-tarea,
+    .tarea-item.segunda-tarea {
+        left: 2.5% !important;
+        width: 95% !important;
+    }
+
+    .tarea-titulo {
+        font-size: 12px;
+    }
+
+    .tarea-categoria {
+        font-size: 10px;
+    }
+
+    .tarea-estado {
+        font-size: 10px;
+    }
+}
+
+/* Móviles pequeños (480px - 600px) */
+@media (max-width: 600px) {
+    .calendario-lateral {
+        width: 95%;
+    }
+
+    .calendario-lateral.colapsado {
+        transform: translateX(calc(100% - 45px));
+    }
+
+    .btn-toggle {
+        width: 45px;
+        height: 55px;
+        font-size: 16px;
+        padding: 12px 6px;
+    }
+
+    .calendario-header {
+        padding: 12px 15px;
+        padding-top: 60px;
+    }
+
+    .fecha-principal {
+        font-size: 18px;
+    }
+
+    .btn-flecha {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .timeline-hours {
+        max-height: 100px;
+    }
+
+    .hora-item {
+        width: 70px;
+        padding: 6px 3px;
+    }
+
+    .hora-label {
+        font-size: 10px;
+    }
+
+    .evento-item {
+        padding: 8px;
+    }
+
+    .evento-content {
+        font-size: 11px;
+    }
+
+    .evento-titulo {
+        font-size: 12px;
+    }
+
+    .tarea-item {
+        padding: 6px;
+        font-size: 10px;
+    }
+
+    .tarea-titulo {
+        font-size: 11px;
+    }
+}
+
+/* Móviles muy pequeños (hasta 480px) */
+@media (max-width: 480px) {
+    .calendario-lateral {
+        width: 100%;
+    }
+
+    .calendario-lateral.colapsado {
+        transform: translateX(calc(100% - 40px));
+    }
+
+    .btn-toggle {
+        width: 40px;
+        height: 50px;
+        font-size: 14px;
+        padding: 10px 5px;
+    }
+
+    .calendario-header {
+        padding: 10px 12px;
+        padding-top: 55px;
+    }
+
+    .fecha-principal {
+        font-size: 16px;
+    }
+
+    .hoy-controls {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .btn-hoy {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .timeline-hours {
+        max-height: 80px;
+    }
+
+    .hora-item {
+        width: 60px;
+        padding: 4px 2px;
+    }
+
+    .hora-label {
+        font-size: 9px;
+    }
+
+    .evento-item {
+        padding: 6px;
+    }
+
+    .evento-content {
+        font-size: 10px;
+    }
+
+    .evento-titulo {
+        font-size: 11px;
+    }
+
+    .tarea-item {
+        padding: 5px;
+        font-size: 9px;
+    }
+
+    .tarea-titulo {
+        font-size: 10px;
+    }
+
+    .tarea-header {
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .tarea-categoria {
+        align-self: flex-start;
+        margin-left: 0;
+    }
+}
+
+/* Overlay de fondo cuando el calendario está abierto en móvil */
+.calendario-overlay {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .calendario-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .calendario-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+}

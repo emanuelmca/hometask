@@ -4,12 +4,14 @@ import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { CommonModule } from '@angular/common';
 import { ChatFloatingComponent } from "../../components/chat-floating/chat-floating";
 import { DashboardService } from '../../service/dashboard.service';
+import { CalendarLateralComponent } from '../../components/calendar-lateral/calendar-lateral';
 
 interface Task {
   id: number;
   titulo: string;
   descripcion: string;
-  estado: string;
+  estado: string | boolean;
+  estado_actual?: string;
   prioridad: string;
   fecha_vencimiento: string;
   categoria?: string;
@@ -26,7 +28,7 @@ interface Event {
 
 @Component({
   selector: 'app-member-dashboard',
-  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent],
+  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent, CalendarLateralComponent],
   templateUrl: './dash-miembro.html',
   styleUrls: ['./dash-miembro.css']
 })
@@ -96,6 +98,7 @@ export class MemberDashboardComponent implements OnInit {
     });
   }
 
+
   loadDashboardData(): void {
     this.loading = true;
 
@@ -130,7 +133,8 @@ export class MemberDashboardComponent implements OnInit {
   }
 
   isTaskCompleted(task: Task): boolean {
-    return task.estado === 'completada' || task.estado === 'finalizada';
+    const status = task.estado_actual || (typeof task.estado === 'string' ? task.estado : '');
+    return status === 'completada' || status === 'finalizada';
   }
 
   goToTaskDetail(taskId: number): void {
@@ -138,13 +142,30 @@ export class MemberDashboardComponent implements OnInit {
   }
 
   toggleShoppingItem(task: Task): void {
-    // Aquí idealmente llamaríamos al servicio para actualizar el estado
-    // Por ahora solo simulamos el cambio localmente
-    if (task.estado === 'completada') {
-      task.estado = 'pendiente';
-    } else {
-      task.estado = 'completada';
-    }
+    // Determinar estado actual (preferir estado_actual si existe)
+    const currentStatus = task.estado_actual || (typeof task.estado === 'string' ? task.estado : 'pendiente');
+    const newStatus = currentStatus === 'completada' ? 'pendiente' : 'completada';
+
+    this.dashboardService.updateTaskStatus(task.id, newStatus).subscribe({
+      next: (updatedTask) => {
+        console.log('✅ Tarea actualizada:', updatedTask);
+        // Actualizar la tarea en la lista local con los datos del servidor
+        Object.assign(task, updatedTask);
+
+        // Asegurar que estado_actual se refleje si la UI depende de 'estado'
+        if (updatedTask.estado_actual) {
+          task.estado_actual = updatedTask.estado_actual;
+          // Si la UI usa 'estado' como string, actualizarlo también para compatibilidad
+          if (typeof task.estado === 'string') {
+            task.estado = updatedTask.estado_actual;
+          }
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error al actualizar estado:', error);
+        alert('No se pudo actualizar el estado de la tarea');
+      }
+    });
   }
 
   formatDate(dateString: string): string {

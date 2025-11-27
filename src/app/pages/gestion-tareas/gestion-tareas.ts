@@ -354,4 +354,30 @@ export class TasksComponent implements OnInit {
   trackByMiembro(index: number, miembro: Miembro): number {
     return miembro.id;
   }
+
+  eliminarTarea(tarea: Tarea): void {
+    const confirmacion = confirm(`¿Estás seguro de que quieres eliminar la tarea "${tarea.titulo}"?`);
+
+    if (!confirmacion) return;
+
+    const headers = this.buildAuthHeaders();
+    if (!headers) {
+      alert('Error de autenticación');
+      return;
+    }
+
+    this.http.delete(`${this.baseUrl}/tareas/${tarea.id}`, { headers })
+      .subscribe({
+        next: () => {
+          this.tareas = this.tareas.filter(t => t.id !== tarea.id);
+          this.aplicarFiltro();
+          alert('✅ Tarea eliminada correctamente');
+        },
+        error: (err) => {
+          console.error('❌ Error eliminando tarea:', err);
+          alert('❌ Error al eliminar la tarea');
+        }
+      });
+  }
+
 }

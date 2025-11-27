@@ -110,4 +110,14 @@ export class DashboardService {
         }
         return this.http.get(`${this.baseUrl}/eventos/hogar/actuales`, { headers });
     }
+
+    // Actualizar estado de una tarea
+    updateTaskStatus(tareaId: number, nuevoEstado: string): Observable<any> {
+        const headers = this.getHeaders();
+        if (!headers) {
+            throw new Error('No hay token de autenticación');
+        }
+        const body = { estado_actual: nuevoEstado };
+        return this.http.put(`${this.baseUrl}/tareas/${tareaId}/estado`, body, { headers });
+    }
 }

@@ -9,16 +9,18 @@
     <div class="tasks-header">
       <div class="row align-items-center">
         <div class="col-md-8">
-          <h1>📋 Gestión de Tareas</h1>
+          <h1>Gestión de Tareas</h1>
           <p>Organiza y gestiona las tareas de tu hogar de forma eficiente</p>
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-primary" (click)="abrirModalCrearTarea()">
-            <span>➕</span> Nueva Tarea
+            <span>+</span> Nueva Tarea
           </button>
         </div>
       </div>
     </div>
+
+
 
     <!-- FILTROS Y ESTADÍSTICAS -->
     <div class="tasks-filters">
@@ -88,6 +90,9 @@
               title="Cambiar estado">
               🔄
             </button>
+            <button class="btn-action" (click)="eliminarTarea(tarea); $event.stopPropagation()" title="Eliminar">
+              🗑️
+            </button>
           </div>
         </div>
 
@@ -141,7 +146,7 @@
         Comienza creando la primera tarea para tu hogar
       </p>
       <button class="btn btn-primary" (click)="abrirModalCrearTarea()">
-        <span>➕</span> Crear Primera Tarea
+        <span>+</span> Crear Primera Tarea
       </button>
     </div>
 
@@ -214,6 +219,8 @@
 
   </div>
 </div>
+
+
 
 <!-- CHAT FLOTANTE -->
 <app-chat-floating></app-chat-floating>

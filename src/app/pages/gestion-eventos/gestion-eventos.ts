@@ -16,6 +16,7 @@ interface Evento {
   duracion_min: number;
   id_hogar: number;
   creado_por: number;
+  estado?: boolean;
 }
 
 @Component({
@@ -54,7 +55,8 @@ export class EventsComponent implements OnInit {
     duracion_min: 60,
     fecha_hora: '',
     id_hogar: 0,
-    creado_por: 0
+    creado_por: 0,
+    estado: true
   };
 
   private baseUrl = 'http://127.0.0.1:8000';
@@ -237,7 +239,8 @@ export class EventsComponent implements OnInit {
       duracion_min: 60,
       fecha_hora: '',
       id_hogar: parseInt(this.idHogar || '0'),
-      creado_por: parseInt(this.idMiembro || '0')
+      creado_por: parseInt(this.idMiembro || '0'),
+      estado: true
     };
 
     this.actualizarFechaHora();
@@ -260,7 +263,8 @@ export class EventsComponent implements OnInit {
       duracion_min: evento.duracion_min,
       fecha_hora: evento.fecha_hora,
       id_hogar: evento.id_hogar,
-      creado_por: evento.creado_por
+      creado_por: evento.creado_por,
+      estado: evento.estado !== undefined ? evento.estado : true
     };
 
     this.errorModal = '';
@@ -270,7 +274,7 @@ export class EventsComponent implements OnInit {
   // Actualizar fecha_hora combinando fecha y hora
   actualizarFechaHora(): void {
     if (this.nuevoEvento.fecha && this.nuevoEvento.hora) {
-      this.nuevoEvento.fecha_hora = `${this.nuevoEvento.fecha}T${this.nuevoEvento.hora}:00`;
+      this.nuevoEvento.fecha_hora = `${this.nuevoEvento.fecha}T${this.nuevoEvento.hora}:00Z`;
     }
   }
 
@@ -308,13 +312,12 @@ export class EventsComponent implements OnInit {
       descripcion: this.nuevoEvento.descripcion,
       fecha_hora: this.nuevoEvento.fecha_hora,
       duracion_min: this.nuevoEvento.duracion_min,
-      id_hogar: this.nuevoEvento.id_hogar,
-      creado_por: this.nuevoEvento.creado_por
+      estado: this.nuevoEvento.estado
     };
 
     if (this.editando && this.eventoEditando) {
-      // Editar evento (PATCH)
-      this.http.patch<Evento>(
+      // Editar evento (PUT)
+      this.http.put<Evento>(
         `${this.baseUrl}/eventos/${this.eventoEditando.id}`,
         eventoData,
         { headers }
@@ -330,9 +333,15 @@ export class EventsComponent implements OnInit {
       });
     } else {
       // Crear evento (POST)
+      const eventoDataConHogar = {
+        ...eventoData,
+        id_hogar: this.nuevoEvento.id_hogar,
+        creado_por: this.nuevoEvento.creado_por
+      };
+
       this.http.post<Evento>(
         `${this.baseUrl}/eventos/`,
-        eventoData,
+        eventoDataConHogar,
         { headers }
       ).subscribe({
         next: (resp) => {
