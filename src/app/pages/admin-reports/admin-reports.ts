@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 // Interfaces for chart data
 interface ActivityData {
@@ -35,7 +36,8 @@ interface UserPerformanceData {
 @Component({
     selector: 'app-admin-reports',
     standalone: true,
-    imports: [CommonModule, NavComponent, ChatFloatingComponent],
+    imports: [CommonModule, NavComponent, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
     templateUrl: './admin-reports.html',
     styleUrls: ['./admin-reports.css', './iframe-fullwidth.css']
 })

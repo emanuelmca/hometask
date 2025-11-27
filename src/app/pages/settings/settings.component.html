@@ -1,0 +1,345 @@
+<div class="settings-container">
+  <!-- Header con botón de regreso -->
+  <div class="settings-header">
+    <button class="back-button" onclick="history.back()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+      </svg>
+      Volver
+    </button>
+    <div class="header-content">
+      <h1>Configuración</h1>
+      <p>Gestiona la configuración de tu hogar y preferencias personales</p>
+    </div>
+  </div>
+
+  <!-- Mensajes de notificación -->
+  <div *ngIf="message" class="alert" [class.alert-success]="messageType === 'success'" [class.alert-error]="messageType === 'error'">
+    {{ message }}
+  </div>
+
+  <!-- Tabs horizontales en la parte superior -->
+  <div class="horizontal-tabs">
+    <button 
+      *ngFor="let tab of tabs"
+      [hidden]="!shouldShowTab(tab)"
+      class="horizontal-tab" 
+      [class.active]="activeTab === tab.id"
+      (click)="changeTab(tab.id)">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- Contenido de los tabs -->
+  <div class="tab-content">
+
+    <!-- ==================== TAB: CONFIGURACIÓN DEL HOGAR ==================== -->
+    <div *ngIf="activeTab === 'home' && isAdmin" class="tab-panel">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Configuración del Hogar</h2>
+          <p>Estas configuraciones afectan a todos los miembros del hogar</p>
+        </div>
+
+        <div class="card-body">
+          <!-- Notificaciones -->
+          <div class="setting-group">
+            <h3>Notificaciones</h3>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <label>Notificaciones Activas</label>
+                <span class="toggle-description">Habilita las notificaciones para todo el hogar</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="configHogar.notificaciones_activas">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <label>Notificaciones por WhatsApp</label>
+                <span class="toggle-description">Enviar notificaciones vía WhatsApp</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="configHogar.notificaciones_whatsapp">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Comentarios -->
+          <div class="setting-group">
+            <h3>Comentarios</h3>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <label>Comentarios Habilitados</label>
+                <span class="toggle-description">Permite que los miembros comenten en tareas</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="configHogar.comentarios_habilitados">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Asistente IA -->
+          <div class="setting-group">
+            <h3>Asistente IA</h3>
+            
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <label>Asistente Activo</label>
+                <span class="toggle-description">Habilita el asistente inteligente para el hogar</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="configHogar.asistente_activo">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="restrictions-section">
+              <label class="section-label">Restricciones del Asistente</label>
+              <p class="section-description">Define temas que el asistente debe evitar</p>
+              
+              <div class="chips-container">
+                <div *ngFor="let restriccion of configHogar.asistente_restricciones; let i = index" class="chip">
+                  {{ restriccion }}
+                  <button class="chip-remove" (click)="eliminarRestriccion(i)" type="button">×</button>
+                </div>
+              </div>
+
+              <div class="add-restriction">
+                <input 
+                  type="text" 
+                  [(ngModel)]="nuevaRestriccion" 
+                  placeholder="Ej: no hablar de finanzas"
+                  (keyup.enter)="agregarRestriccion()"
+                  class="restriction-input">
+                <button (click)="agregarRestriccion()" class="btn-add" type="button">Agregar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de acción -->
+          <div class="card-actions">
+            <button (click)="guardarAsistente()" [disabled]="loading" class="btn btn-secondary">
+              {{ loading ? 'Guardando...' : 'Guardar Asistente' }}
+            </button>
+            <button (click)="guardarConfigHogar()" [disabled]="loading" class="btn btn-primary">
+              {{ loading ? 'Guardando...' : 'Guardar Todo' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: MI PERFIL ==================== -->
+    <div *ngIf="activeTab === 'profile'" class="tab-panel">
+      
+      <!-- Card: Información Personal -->
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Información Personal</h2>
+          <p>Actualiza tu información de perfil</p>
+        </div>
+
+        <div class="card-body">
+          <div class="form-group">
+            <label>Nombre Completo</label>
+            <input 
+              type="text" 
+              [(ngModel)]="miPerfil.nombre_completo" 
+              placeholder="Tu nombre completo"
+              class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input 
+              type="email" 
+              [(ngModel)]="miPerfil.correo_electronico" 
+              placeholder="tu@email.com"
+              class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label>Contraseña <span class="optional">(opcional - dejar vacío para no cambiar)</span></label>
+            <input 
+              type="password" 
+              [(ngModel)]="miPerfil.contrasena" 
+              placeholder="Nueva contraseña"
+              class="form-input">
+          </div>
+
+          <div class="card-actions">
+            <button (click)="guardarMiPerfil()" [disabled]="loading" class="btn btn-primary">
+              {{ loading ? 'Guardando...' : 'Guardar Perfil' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Mis Notificaciones -->
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Mis Notificaciones</h2>
+          <p>Configura cómo deseas recibir notificaciones</p>
+          <div *ngIf="!misPreferencias.recibir_notificaciones_whatsapp" class="badge badge-warning">
+            WhatsApp off
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <label>Recibir Notificaciones</label>
+              <span class="toggle-description">Recibe notificaciones generales</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="misPreferencias.recibir_notificaciones">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <label>Notificaciones por WhatsApp</label>
+              <span class="toggle-description">Recibe notificaciones vía WhatsApp</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="misPreferencias.recibir_notificaciones_whatsapp">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <label>Comentarios Habilitados</label>
+              <span class="toggle-description">Permite que otros vean y comenten tus tareas</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="misPreferencias.comentarios_habilitados">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="card-actions">
+            <button (click)="guardarMisPreferencias()" [disabled]="loading" class="btn btn-primary">
+              {{ loading ? 'Guardando...' : 'Guardar Preferencias' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB: GESTIÓN DE MIEMBROS ==================== -->
+    <div *ngIf="activeTab === 'members' && isAdmin" class="tab-panel">
+      <div class="settings-card">
+        <div class="card-header">
+          <h2>Miembros del Hogar</h2>
+          <p>Gestiona roles y preferencias de los miembros</p>
+        </div>
+
+        <div class="card-body">
+          <div class="members-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Rol</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let miembro of miembros">
+                  <td>{{ miembro.nombre_completo }}</td>
+                  <td>{{ miembro.correo_electronico }}</td>
+                  <td>
+                    <select 
+                      [(ngModel)]="miembro.id_rol" 
+                      (change)="actualizarRolMiembro(miembro, miembro.id_rol)"
+                      class="role-select">
+                      <option value="1">Administrador</option>
+                      <option value="2">Miembro</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button (click)="editarPreferenciasMiembro(miembro)" class="btn btn-small">
+                      Editar Preferencias
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="miembros.length === 0">
+                  <td colspan="4" class="empty-state">No hay otros miembros en el hogar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== DIALOG: EDITAR PREFERENCIAS DE MIEMBRO ==================== -->
+  <div *ngIf="showMemberDialog" class="dialog-overlay" (click)="cerrarDialogMiembro()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Editar Preferencias</h2>
+        <p *ngIf="selectedMember">{{ selectedMember.nombre_completo }}</p>
+        <button class="dialog-close" (click)="cerrarDialogMiembro()">×</button>
+      </div>
+
+      <div class="dialog-body">
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <label>Recibir Notificaciones</label>
+            <span class="toggle-description">El miembro recibirá notificaciones</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="memberPreferences.recibir_notificaciones">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <label>Notificaciones por WhatsApp</label>
+            <span class="toggle-description">El miembro recibirá notificaciones por WhatsApp</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="memberPreferences.recibir_notificaciones_whatsapp">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <label>Comentarios Habilitados</label>
+            <span class="toggle-description">Permite comentarios en las tareas del miembro</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="memberPreferences.comentarios_habilitados">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button (click)="cerrarDialogMiembro()" class="btn btn-secondary">Cancelar</button>
+        <button (click)="guardarPreferenciasMiembro()" [disabled]="loading" class="btn btn-primary">
+          {{ loading ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+</div>
