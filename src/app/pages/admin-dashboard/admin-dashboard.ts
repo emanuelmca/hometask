@@ -1,10 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
-import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http'; 
-import { RouterLink } from '@angular/router'; 
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { CalendarComponent } from '../../components/calendar/calendar';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 // -------------------------------------------------------------------
 // 1. Interfaces para el tipado de datos
@@ -57,16 +58,17 @@ interface Tarea {
 // -------------------------------------------------------------------
 
 @Component({
-  selector: 'app-root', 
+  selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink, 
+    RouterLink,
     NgIf,
     HttpClientModule,
     CalendarComponent,
     NavComponent,
-    ChatFloatingComponent 
+    ChatFloatingComponent,
+    VirtualAssistantFabComponent
   ],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.css']
@@ -80,7 +82,7 @@ export class AdminDashboard implements OnInit {
   // Propiedades existentes
   cantidadMiembros: number | null = null;
   nombreHogar: string = '';
-  idHogar = localStorage.getItem('id_hogar'); 
+  idHogar = localStorage.getItem('id_hogar');
   eventos: { titulo: string, fecha_hora: string }[] = [];
   private baseUrl = 'http://127.0.0.1:8000';
 
@@ -89,7 +91,7 @@ export class AdminDashboard implements OnInit {
   // -------------------------------------------------------------------
   miembros: Miembro[] = [];
   totalMiembros: number | null = null;
-  
+
   // 👉 NUEVA PROPIEDAD: Lista de tareas
   tareas: Tarea[] = [];
 
@@ -168,18 +170,18 @@ export class AdminDashboard implements OnInit {
     const headers = this.buildAuthHeaders();
     if (!headers || !this.idHogar) {
       console.warn("Token o ID de Hogar no disponible. No se cargarán los miembros.");
-      this.totalMiembros = 0; 
+      this.totalMiembros = 0;
       return;
     }
 
     const url = `${this.baseUrl}/miembros/hogar/${this.idHogar}`;
     console.log(`Cargando miembros desde: ${url}`);
-    
+
     this.http.get<Miembro[]>(url, { headers })
       .subscribe({
         next: (resp) => {
           this.miembros = resp;
-          this.totalMiembros = resp.length; 
+          this.totalMiembros = resp.length;
           console.log(`Miembros cargados exitosamente. Total: ${this.totalMiembros}`);
         },
         error: (err) => {
@@ -201,7 +203,7 @@ export class AdminDashboard implements OnInit {
 
     const url = `${this.baseUrl}/tareas/hogar/todas`;
     console.log(`Cargando tareas desde: ${url}`);
-    
+
     this.http.get<Tarea[]>(url, { headers })
       .subscribe({
         next: (resp) => {
@@ -228,7 +230,7 @@ export class AdminDashboard implements OnInit {
     this.cargarNombreHogar();
     this.cargarEventos();
     this.cargarMiembros();
-    
+
     // 🆕 LLAMADA A LA FUNCIÓN DE TAREAS
     this.cargarTareas();
   }

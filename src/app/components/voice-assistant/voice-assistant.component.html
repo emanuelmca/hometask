@@ -1,0 +1,87 @@
+<div class="voice-orb-container">
+  <!-- Orbe principal -->
+  <div class="main-orb" 
+       [class.recording]="isRecording" 
+       [class.sending]="isSending"
+       [class.speaking]="audioUrl && isPulsing"
+       (click)="handleOrbClick()">
+    <div class="orb-inner">
+      <span class="orb-icon">🎤</span>
+    </div>
+    
+    <!-- Ondas de audio al grabar -->
+    <div class="audio-waves" *ngIf="isRecording">
+      <div class="wave"></div>
+      <div class="wave"></div>
+      <div class="wave"></div>
+    </div>
+    
+    <!-- Partículas cuando habla el asistente -->
+    <div class="particles" *ngIf="isPulsing">
+      <div class="particle" *ngFor="let p of [1,2,3,4,5,6,7,8]"></div>
+    </div>
+  </div>
+
+  <!-- Burbujas de controles -->
+  <div class="bubbles-menu" *ngIf="menuOpen">
+    <!-- Burbuja Grabar -->
+    <div class="bubble bubble-1" 
+         [class.disabled]="isRecording || isSending"
+         (click)="iniciarGrabacion()">
+      <span class="bubble-icon">⏺</span>
+      <span class="bubble-label">Grabar</span>
+    </div>
+
+    <!-- Burbuja Detener -->
+    <div class="bubble bubble-2" 
+         [class.disabled]="!isRecording || isSending"
+         (click)="detenerYEnviar()">
+      <span class="bubble-icon">⏹</span>
+      <span class="bubble-label">Enviar</span>
+    </div>
+
+    <!-- Burbuja Reiniciar -->
+    <div class="bubble bubble-3" 
+         [class.disabled]="isRecording || isSending"
+         (click)="reset()">
+      <span class="bubble-icon">🔄</span>
+      <span class="bubble-label">Reset</span>
+    </div>
+  </div>
+
+  <!-- Panel de respuesta expandible -->
+  <div class="response-panel" *ngIf="textoUsuario || respuestaTexto" [@slideUp]>
+    <div class="panel-content">
+      <!-- Mensaje del usuario -->
+      <div class="speech-bubble user" *ngIf="textoUsuario">
+        <div class="bubble-avatar">👤</div>
+        <div class="bubble-text">{{ textoUsuario }}</div>
+      </div>
+
+      <!-- Respuesta del asistente -->
+      <div class="speech-bubble assistant" *ngIf="respuestaTexto" [class.pulsing]="isPulsing">
+        <div class="bubble-avatar">🤖</div>
+        <div class="bubble-text">{{ respuestaTexto }}</div>
+      </div>
+
+      <!-- Reproductor de audio -->
+      <div class="audio-player-bubble" *ngIf="audioUrl">
+        <audio controls [src]="audioUrl" autoplay></audio>
+      </div>
+    </div>
+    
+    <button class="close-panel" (click)="reset()">✕</button>
+  </div>
+
+  <!-- Indicador de error flotante -->
+  <div class="error-bubble" *ngIf="errorMessage" [@fadeIn]>
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Spinner de carga -->
+  <div class="loading-orb" *ngIf="isSending">
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+  </div>
+</div>

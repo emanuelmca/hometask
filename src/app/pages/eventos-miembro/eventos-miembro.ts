@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 import { DashboardService } from '../../service/dashboard.service';
 
 interface Evento {
@@ -25,7 +26,8 @@ interface CalendarDay {
 
 @Component({
     selector: 'app-eventos-miembro',
-    imports: [CommonModule, NavMiembroComponent, ChatFloatingComponent],
+    imports: [CommonModule, NavMiembroComponent, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
     templateUrl: './eventos-miembro.html',
     styleUrls: ['./eventos-miembro.css']
 })

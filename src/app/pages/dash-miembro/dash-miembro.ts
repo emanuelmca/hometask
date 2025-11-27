@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { CommonModule } from '@angular/common';
 import { ChatFloatingComponent } from "../../components/chat-floating/chat-floating";
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 import { DashboardService } from '../../service/dashboard.service';
 
 interface Task {
@@ -26,7 +27,8 @@ interface Event {
 
 @Component({
   selector: 'app-member-dashboard',
-  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent],
+  imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
   templateUrl: './dash-miembro.html',
   styleUrls: ['./dash-miembro.css']
 })

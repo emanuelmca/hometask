@@ -5,11 +5,13 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NavComponent } from '../../components/nav/nav';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 @Component({
   selector: 'app-members',
   standalone: true,
-  imports: [CommonModule, NavComponent, RouterModule, FormsModule, ChatFloatingComponent],
+  imports: [CommonModule, NavComponent, RouterModule, FormsModule, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
   templateUrl: './members.html',
   styleUrls: ['./members.css'],
 })

@@ -42,43 +42,42 @@ export class Login {
         const decoded = this.decodeToken(token);
         const rol = decoded?.rol;
 
-     
+
         localStorage.setItem('rol_usuario', rol);
 
         const miembroId = response.id_miembro;
         const idHogar = response.id_hogar;
 
-        localStorage.setItem('access_token', token);
+        this.authService.setToken(token);
         localStorage.setItem('id_hogar', idHogar);
         localStorage.setItem('id_miembro', miembroId);
 
-        
+
         const headers = new HttpHeaders({
           Authorization: `Bearer ${token}`
         });
 
-      
-              const nombre = localStorage.getItem('rol_usuario') || 'Usuario';
-              this.authService.setUserName(nombre);
-            
 
-              this.loading = false;
-              this.successMessage = `Bienvenido, ${nombre}`;
+        const nombre = localStorage.getItem('rol_usuario') || 'Usuario';
+        this.authService.setUserName(nombre);
 
-              // ⬇️ Redirección según rol
-              setTimeout(() => {
-                
-                if (rol === "Administrador") {
-                  this.router.navigate(['/dashboard']);
-                } 
-                else
-                   {
-                    console.log("Redirigiendo a dash-miembro");
-                  this.router.navigate(['/dash-miembro']);
-                }
 
-              }, 1500);
-          
+        this.loading = false;
+        this.successMessage = `Bienvenido, ${nombre}`;
+
+        // ⬇️ Redirección según rol
+        setTimeout(() => {
+
+          if (rol === "Administrador") {
+            this.router.navigate(['/dashboard']);
+          }
+          else {
+            console.log("Redirigiendo a dash-miembro");
+            this.router.navigate(['/dash-miembro']);
+          }
+
+        }, 1500);
+
       },
       error: (err) => {
         console.error(err);

@@ -13,6 +13,7 @@ import { TaskDetailComponent } from './pages/task-detail/task-detail';
 import { MessagingComponent } from './pages/messaging/messaging';
 import { AssistantChatComponent } from './pages/assistant-chat/assistant-chat';
 import { EventosMiembroComponent } from './pages/eventos-miembro/eventos-miembro';
+import { SettingsComponent } from './pages/settings/settings.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -28,5 +29,6 @@ export const routes: Routes = [
   { path: 'assistant', component: AssistantChatComponent, canActivate: [MemberGuard] },
   { path: 'admin/reports', component: AdminReportsComponent, canActivate: [MemberGuard] },
   { path: 'eventos-miembro', component: EventosMiembroComponent, canActivate: [MemberGuard] },
+  { path: 'settings', component: SettingsComponent, canActivate: [MemberGuard] },
   { path: '**', redirectTo: '/login' }
 ];

@@ -6,6 +6,7 @@ import { Router, RouterModule } from '@angular/router';
 import { NavComponent } from '../../components/nav/nav';
 import { NavMiembroComponent } from '../../components/nav-miembro/nav-miembro';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 // Interfaces
 interface Miembro {
@@ -38,7 +39,8 @@ interface Tarea {
 @Component({
   selector: 'app-tasks',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavComponent, NavMiembroComponent, ChatFloatingComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavComponent, NavMiembroComponent, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
   templateUrl: './gestion-tareas.html',
   styleUrls: ['./gestion-tareas.css']
 })

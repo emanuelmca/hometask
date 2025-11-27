@@ -1,0 +1,108 @@
+<!-- Floating Action Button -->
+<button 
+  class="fab-button" 
+  (click)="togglePanel()" 
+  [attr.aria-label]="isOpen ? 'Cerrar asistente' : 'Abrir asistente'"
+  [class.panel-open]="isOpen">
+  <span class="fab-icon">✨</span>
+  <span class="notification-badge" *ngIf="unreadMessages > 0 && !isOpen">{{ unreadMessages }}</span>
+</button>
+
+<!-- Sliding Panel Overlay -->
+<div class="panel-overlay" *ngIf="isOpen" (click)="togglePanel()"></div>
+
+<!-- Sliding Panel -->
+<div class="assistant-panel" [class.open]="isOpen">
+  
+  <!-- Panel Header -->
+  <div class="panel-header">
+    <div class="header-info">
+      <div class="header-icon">✨</div>
+      <div class="header-text">
+        <h2>Asistente Virtual</h2>
+        <span class="status-online">En línea</span>
+      </div>
+    </div>
+    <button class="close-btn" (click)="togglePanel()" title="Cerrar">
+      <span>✖</span>
+    </button>
+  </div>
+
+  <!-- Chat Messages Area -->
+  <div class="chat-area" #scrollContainer>
+    <div class="messages-list">
+      
+      <ng-container *ngFor="let msg of messages">
+        
+        <!-- Bubble Messages -->
+        <div *ngIf="msg.type === 'bubble'" 
+             class="message-bubble" 
+             [ngClass]="{'assistant': msg.from === 'assistant', 'user': msg.from === 'user'}">
+          <div class="avatar" *ngIf="msg.from === 'assistant'">
+            <span>✨</span>
+          </div>
+          <div class="bubble-content">
+            {{ msg.content }}
+          </div>
+        </div>
+
+        <!-- Bullet List Messages -->
+        <div *ngIf="msg.type === 'bullets'" class="message-bullets assistant">
+          <div class="avatar-spacer"></div>
+          <div class="bullets-content">
+            <ul>
+              <li *ngFor="let bullet of msg.content">{{ bullet }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div *ngIf="msg.type === 'actions'" class="message-actions assistant">
+          <div class="avatar-spacer"></div>
+          <div class="actions-chips">
+            <button *ngFor="let action of msg.content" 
+                    class="action-chip" 
+                    (click)="handleAction(action)">
+              {{ action.label }}
+            </button>
+          </div>
+        </div>
+
+      </ng-container>
+
+      <!-- Loading Indicator -->
+      <div *ngIf="loading" class="message-bubble assistant loading">
+        <div class="avatar">
+          <span>✨</span>
+        </div>
+        <div class="bubble-content">
+          <div class="typing-dots">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="input-area">
+    <input 
+      type="text" 
+      [(ngModel)]="newMessage" 
+      (keyup.enter)="sendMessage()"
+      placeholder="Escribe un mensaje..."
+      [disabled]="loading"
+      autocomplete="off"
+    >
+    <button 
+      class="send-btn" 
+      (click)="sendMessage()" 
+      [disabled]="!newMessage.trim() || loading"
+      [title]="loading ? 'Enviando...' : 'Enviar mensaje'">
+      <span *ngIf="!loading">➤</span>
+      <div *ngIf="loading" class="spinner-small"></div>
+    </button>
+  </div>
+
+</div>

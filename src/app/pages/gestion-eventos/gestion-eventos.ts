@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { NavComponent } from '../../components/nav/nav';
 import { CalendarComponent } from '../../components/calendar/calendar';
 import { ChatFloatingComponent } from '../../components/chat-floating/chat-floating';
+import { VirtualAssistantFabComponent } from '../../components/virtual-assistant-fab/virtual-assistant-fab';
 
 // Interfaces
 interface Evento {
@@ -21,7 +22,8 @@ interface Evento {
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NavComponent, CalendarComponent, ChatFloatingComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NavComponent, CalendarComponent, ChatFloatingComponent,
+    VirtualAssistantFabComponent],
   templateUrl: './gestion-eventos.html',
   styleUrls: ['./gestion-eventos.css']
 })
