@@ -1,12 +1,12 @@
 <!-- Botón flotante -->
-<button class="chat-float-btn" (click)="toggleChat()">
-  💬
+<button class="chat-float-btn" (click)="toggleChat()" [attr.aria-label]="isOpen ? 'Cerrar chat' : 'Abrir chat'">
+  <span style="margin-top: -2px;">💬</span>
   <span class="notification-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
 </button>
 
 <!-- Ventana de chat -->
 <div class="chat-box" *ngIf="isOpen">
-  
+
   <!-- Header del chat -->
   <div class="chat-header">
     <div class="chat-header-info">
@@ -22,35 +22,22 @@
       </span>
     </div>
     <div class="chat-header-actions">
-      <button 
-        class="header-btn" 
-        *ngIf="contactoSeleccionado" 
-        (click)="volverALista()"
-        title="Volver a contactos"
-      >
+      <button class="header-btn" *ngIf="contactoSeleccionado" (click)="volverALista()" title="Volver a contactos">
         ‹
       </button>
-      <button class="close-btn" (click)="toggleChat()">✖</button>
+      <button class="close-btn" (click)="toggleChat()" title="Cerrar chat">✖</button>
     </div>
   </div>
 
   <!-- Lista de contactos -->
   <div class="contacts-list" *ngIf="!contactoSeleccionado">
     <div class="contacts-search">
-      <input 
-        type="text" 
-        placeholder="Buscar contacto..." 
-        [(ngModel)]="busquedaContacto"
-        class="search-input"
-      >
+      <input type="text" placeholder="Buscar contacto..." [(ngModel)]="busquedaContacto" class="search-input">
     </div>
-    
+
     <div class="contacts-container">
-      <div 
-        class="contact-item" 
-        *ngFor="let miembro of contactosFiltrados"
-        (click)="seleccionarContacto(miembro.id)"
-      >
+      <div class="contact-item" *ngFor="let miembro of contactosFiltrados; trackBy: trackByMiembro"
+        (click)="seleccionarContacto(miembro.id)">
         <div class="contact-avatar">
           {{ obtenerIniciales(miembro.nombre_completo) }}
         </div>
@@ -81,27 +68,23 @@
 
   <!-- Cuerpo del chat -->
   <div class="chat-body" #chatBody *ngIf="contactoSeleccionado">
-    
+
     <!-- Loading -->
     <div class="loading-messages" *ngIf="cargandoMensajes">
       <div class="spinner-small"></div>
-      <span>Cargando mensajes...</span>
+      <span>Cargando conversación...</span>
     </div>
 
     <!-- Mensajes -->
     <div *ngIf="!cargandoMensajes">
-      <div class="message-date" *ngFor="let grupo of mensajesAgrupados">
+      <div class="message-date" *ngFor="let grupo of mensajesAgrupados; trackBy: trackByGrupo">
         <span class="date-separator">{{ grupo.fecha }}</span>
-        <div 
-          class="msg" 
-          [class.me]="mensaje.id_remitente === miId"
-          [class.other]="mensaje.id_remitente !== miId"
-          *ngFor="let mensaje of grupo.mensajes"
-        >
+        <div class="msg" [class.me]="mensaje.id_remitente === miId" [class.other]="mensaje.id_remitente !== miId"
+          *ngFor="let mensaje of grupo.mensajes; trackBy: trackByMensaje">
           <div class="msg-content">{{ mensaje.contenido }}</div>
-          <div class="msg-time">{{ mensaje.fecha_envio | date:'HH:mm' }}</div>
-          <div class="msg-status" *ngIf="mensaje.id_remitente === miId">
-            ✓
+          <div class="msg-time">
+            {{ mensaje.fecha_envio | date:'HH:mm' }}
+            <span class="msg-status" *ngIf="mensaje.id_remitente === miId">✓</span>
           </div>
         </div>
       </div>
@@ -109,8 +92,8 @@
       <!-- Sin mensajes -->
       <div class="no-messages" *ngIf="mensajes.length === 0">
         <div class="no-messages-icon">💬</div>
-        <h4>No hay mensajes aún</h4>
-        <p>¡Envía el primer mensaje a {{ obtenerNombreContacto() }}!</p>
+        <h4>No hay mensajes</h4>
+        <p>Envía un mensaje a {{ obtenerNombreContacto() }} para comenzar la conversación.</p>
       </div>
     </div>
 
@@ -118,19 +101,12 @@
 
   <!-- Input de mensaje -->
   <div class="chat-input" *ngIf="contactoSeleccionado">
-    <input 
-      type="text" 
-      placeholder="Escribe un mensaje..." 
-      [(ngModel)]="nuevoMensaje"
-      (keyup.enter)="enviarMensaje()"
-      [disabled]="enviandoMensaje"
-    >
-    <button 
-      (click)="enviarMensaje()" 
-      [disabled]="!nuevoMensaje.trim() || enviandoMensaje"
-      class="send-btn"
-    >
-      <span *ngIf="enviandoMensaje" class="spinner-small"></span>
+    <input type="text" placeholder="Escribe un mensaje..." [(ngModel)]="nuevoMensaje" (keyup.enter)="enviarMensaje()"
+      [disabled]="enviandoMensaje">
+    <button (click)="enviarMensaje()" [disabled]="!nuevoMensaje.trim() || enviandoMensaje" class="send-btn"
+      [title]="enviandoMensaje ? 'Enviando...' : 'Enviar mensaje'">
+      <span *ngIf="enviandoMensaje" class="spinner-small"
+        style="border-color: rgba(255,255,255,0.3); border-top-color: white;"></span>
       <span *ngIf="!enviandoMensaje">➤</span>
     </button>
   </div>

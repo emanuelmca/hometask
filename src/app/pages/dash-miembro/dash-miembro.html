@@ -12,38 +12,8 @@
     <div class="dashboard-content">
       <!-- Columna Izquierda -->
       <div class="main-column">
-        <!-- Mis Tareas Hoy -->
-        <div class="card tasks-card">
-          <h2>Mis Tareas Hoy</h2>
-          <div class="loading" *ngIf="loading">Cargando tareas...</div>
-          <div class="error" *ngIf="error">{{ error }}</div>
-          <div class="tasks-list" *ngIf="!loading && !error">
-            <div class="task-item" 
-                 *ngFor="let task of tasks" 
-                 (click)="goToTaskDetail(task.id)"
-                 [class.completed]="isTaskCompleted(task)"
-                 style="cursor: pointer;">
-              <div class="task-content">
-                <span class="task-text" [class.completed]="isTaskCompleted(task)">
-                  {{ task.titulo }}
-                </span>
-                <span class="task-description" *ngIf="task.descripcion">
-                  {{ task.descripcion }}
-                </span>
-                <div class="task-meta">
-                  <span class="task-tag urgent" *ngIf="isTaskUrgent(task)">Urgente</span>
-                  <span class="task-tag" [class]="task.estado">{{ task.estado }}</span>
-                  <span class="task-date" *ngIf="task.fecha_vencimiento">
-                    {{ formatDate(task.fecha_vencimiento) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div class="empty-state" *ngIf="tasks.length === 0">
-              <p>No tienes tareas asignadas para hoy</p>
-            </div>
-          </div>
-        </div>
+        <!-- Mis Tareas Generales -->
+
 
         <!-- Próximos Eventos -->
         <div class="card events-card">
@@ -66,16 +36,41 @@
 
       <!-- Columna Derecha -->
       <div class="sidebar-column">
-        <!-- Lista de la Compra -->
+        <!-- Tareas del Hogar (Limpieza, Cocina, Mantenimiento) -->
+        <div class="card shopping-tasks-card">
+          <h2>Tareas del Hogar</h2>
+          <div class="tasks-list" *ngIf="!loading">
+            <div class="task-item" *ngFor="let task of shoppingTasks" (click)="goToTaskDetail(task.id)"
+              [class.completed]="isTaskCompleted(task)" style="cursor: pointer;">
+              <div class="task-content">
+                <span class="task-text" [class.completed]="isTaskCompleted(task)">
+                  {{ task.titulo }}
+                </span>
+                <div class="task-meta">
+                  <span class="task-category" *ngIf="task.categoria">{{ task.categoria }}</span>
+                  <span class="task-tag" [class]="task.estado">{{ task.estado }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="empty-state" *ngIf="shoppingTasks.length === 0">
+              <p>No hay tareas del hogar pendientes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de la Compra (Categoría 'compras') -->
         <div class="card shopping-card">
           <h2>Lista de la Compra</h2>
           <div class="shopping-list">
-            <div class="shopping-item" *ngFor="let item of shoppingList">
+            <div class="shopping-item" *ngFor="let task of groceryListTasks">
               <label class="shopping-checkbox">
-                <input type="checkbox" [checked]="item.completed" (change)="toggleShoppingItem(item.id)">
+                <input type="checkbox" [checked]="isTaskCompleted(task)" (change)="toggleShoppingItem(task)">
                 <span class="checkmark"></span>
               </label>
-              <span class="shopping-text" [class.completed]="item.completed">{{ item.name }}</span>
+              <span class="shopping-text" [class.completed]="isTaskCompleted(task)">{{ task.titulo }}</span>
+            </div>
+            <div class="empty-state" *ngIf="groceryListTasks.length === 0">
+              <p>No hay artículos en la lista de compra</p>
             </div>
           </div>
         </div>
@@ -88,12 +83,6 @@
             <div class="weather-condition">Soleado</div>
             <div class="location">Madrid, ES</div>
           </div>
-        </div>
-
-        <!-- Recordatorio Rápido -->
-        <div class="reminder-card">
-          <h3>Recordatorio Rápido</h3>
-          <p>No olvidar recoger el paquete de la tintorería antes de las 18h.</p>
         </div>
       </div>
     </div>

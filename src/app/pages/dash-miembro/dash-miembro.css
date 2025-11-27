@@ -107,8 +107,8 @@
   transition: all 0.3s ease;
 }
 
-.task-checkbox input:checked + .checkmark,
-.shopping-checkbox input:checked + .checkmark {
+.task-checkbox input:checked+.checkmark,
+.shopping-checkbox input:checked+.checkmark {
   background-color: #2ecc71;
   border-color: #2ecc71;
 }
@@ -126,8 +126,8 @@
   transform: rotate(45deg);
 }
 
-.task-checkbox input:checked + .checkmark:after,
-.shopping-checkbox input:checked + .checkmark:after {
+.task-checkbox input:checked+.checkmark:after,
+.shopping-checkbox input:checked+.checkmark:after {
   display: block;
 }
 
@@ -255,13 +255,13 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
-  
+
   .sidebar-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
   }
-  
+
   .reminder-card {
     grid-column: 1 / -1;
   }
@@ -271,23 +271,23 @@
   .member-dashboard {
     padding: 10px;
   }
-  
+
   .dashboard-header h1 {
     font-size: 2rem;
   }
-  
+
   .dashboard-header p {
     font-size: 1rem;
   }
-  
+
   .card {
     padding: 20px;
   }
-  
+
   .sidebar-column {
     grid-template-columns: 1fr;
   }
-  
+
   .temperature {
     font-size: 2rem;
   }
@@ -297,17 +297,17 @@
   .dashboard-header h1 {
     font-size: 1.8rem;
   }
-  
+
   .card {
     padding: 15px;
   }
-  
+
   .task-text,
   .event-text,
   .shopping-text {
     font-size: 1rem;
   }
-  
+
   .temperature {
     font-size: 1.8rem;
   }
@@ -319,6 +319,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -329,8 +330,22 @@
   animation: fadeIn 0.6s ease-out;
 }
 
-.tasks-card { animation-delay: 0.1s; }
-.events-card { animation-delay: 0.2s; }
-.shopping-card { animation-delay: 0.3s; }
-.home-info-card { animation-delay: 0.4s; }
-.reminder-card { animation-delay: 0.5s; }
+.tasks-card {
+  animation-delay: 0.1s;
+}
+
+.events-card {
+  animation-delay: 0.2s;
+}
+
+.shopping-card {
+  animation-delay: 0.3s;
+}
+
+.home-info-card {
+  animation-delay: 0.4s;
+}
+
+.reminder-card {
+  animation-delay: 0.5s;
+}

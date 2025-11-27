@@ -24,12 +24,6 @@ interface Event {
   estado: string;
 }
 
-interface ShoppingItem {
-  id: number;
-  name: string;
-  completed: boolean;
-}
-
 @Component({
   selector: 'app-member-dashboard',
   imports: [NavMiembroComponent, CommonModule, ChatFloatingComponent],
@@ -44,12 +38,29 @@ export class MemberDashboardComponent implements OnInit {
   error: string = '';
   memberName: string = 'Usuario';
 
-  shoppingList: ShoppingItem[] = [
-    { id: 1, name: 'Leche', completed: false },
-    { id: 2, name: 'Pan integral', completed: true },
-    { id: 3, name: 'Huevos (una docena)', completed: false },
-    { id: 4, name: 'Aguacates', completed: false }
-  ];
+  // Categorías de tareas relacionadas con compras/hogar (excluyendo 'compras' que va aparte)
+  private shoppingCategories = ['limpieza', 'cocina', 'mantenimiento'];
+
+  // Tareas separadas por tipo
+  get shoppingTasks(): Task[] {
+    return this.tasks.filter(task =>
+      task.categoria && this.shoppingCategories.includes(task.categoria.toLowerCase())
+    );
+  }
+
+  get generalTasks(): Task[] {
+    return this.tasks.filter(task =>
+      !task.categoria ||
+      (!this.shoppingCategories.includes(task.categoria.toLowerCase()) &&
+        task.categoria.toLowerCase() !== 'compras')
+    );
+  }
+
+  get groceryListTasks(): Task[] {
+    return this.tasks.filter(task =>
+      task.categoria && task.categoria.toLowerCase() === 'compras'
+    );
+  }
 
   constructor(
     private dashboardService: DashboardService,
@@ -126,10 +137,13 @@ export class MemberDashboardComponent implements OnInit {
     this.router.navigate(['/task', taskId]);
   }
 
-  toggleShoppingItem(itemId: number): void {
-    const item = this.shoppingList.find(i => i.id === itemId);
-    if (item) {
-      item.completed = !item.completed;
+  toggleShoppingItem(task: Task): void {
+    // Aquí idealmente llamaríamos al servicio para actualizar el estado
+    // Por ahora solo simulamos el cambio localmente
+    if (task.estado === 'completada') {
+      task.estado = 'pendiente';
+    } else {
+      task.estado = 'completada';
     }
   }
 

@@ -45,21 +45,21 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   isOpen = false;
   cargandoMensajes = false;
   enviandoMensaje = false;
-  
+
   // Datos
   miembros: Miembro[] = [];
   mensajes: Mensaje[] = [];
   contactoSeleccionado: number | null = null;
   nuevoMensaje = '';
   busquedaContacto = '';
-  
+
   // IDs
   miId = parseInt(localStorage.getItem('id_miembro') || '0');
   idHogar = localStorage.getItem('id_hogar');
-  
+
   // Notificaciones
   unreadMessages = 0;
-  
+
   // Polling
   private pollingSubscription?: Subscription;
   private readonly POLLING_INTERVAL = 3000;
@@ -69,14 +69,41 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
 
   private baseUrl = 'http://127.0.0.1:8000';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.cargarMiembros();
+    this.restoreState();
   }
 
   ngOnDestroy(): void {
     this.detenerPolling();
+  }
+
+  // Restaurar estado del chat
+  private restoreState(): void {
+    const savedState = localStorage.getItem('chat_state');
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      this.isOpen = state.isOpen;
+
+      if (this.isOpen && state.contactoSeleccionado) {
+        this.contactoSeleccionado = state.contactoSeleccionado;
+        // Esperar a que se carguen los miembros para tener el contexto completo si es necesario
+        // pero podemos iniciar la carga de mensajes inmediatamente
+        this.cargarMensajes(this.contactoSeleccionado!);
+        this.iniciarPolling();
+      }
+    }
+  }
+
+  // Guardar estado del chat
+  private saveState(): void {
+    const state = {
+      isOpen: this.isOpen,
+      contactoSeleccionado: this.contactoSeleccionado
+    };
+    localStorage.setItem('chat_state', JSON.stringify(state));
   }
 
   // Headers de autenticación
@@ -101,12 +128,25 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
     if (!this.busquedaContacto.trim()) {
       return this.otrosMiembros;
     }
-    
+
     const busqueda = this.busquedaContacto.toLowerCase();
-    return this.otrosMiembros.filter(miembro => 
+    return this.otrosMiembros.filter(miembro =>
       miembro.nombre_completo.toLowerCase().includes(busqueda) ||
       miembro.rol.nombre.toLowerCase().includes(busqueda)
     );
+  }
+
+  // TrackBy functions
+  trackByMiembro(index: number, miembro: Miembro): number {
+    return miembro.id;
+  }
+
+  trackByGrupo(index: number, grupo: MensajeGrupo): string {
+    return grupo.fecha;
+  }
+
+  trackByMensaje(index: number, mensaje: Mensaje): number {
+    return mensaje.id;
   }
 
   // Obtener iniciales para el avatar
@@ -128,8 +168,8 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   // Obtener mensajes no leídos de un contacto
   obtenerMensajesNoLeidos(contactoId: number): number {
     const mensajes = this.mensajesPorContacto[contactoId] || [];
-    return mensajes.filter(msg => 
-      msg.id_remitente === contactoId && 
+    return mensajes.filter(msg =>
+      msg.id_remitente === contactoId &&
       !this.esMensajeVisto(msg)
     ).length;
   }
@@ -150,7 +190,7 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
         next: (resp) => {
           this.miembros = resp;
           console.log('✅ Miembros cargados:', resp.length);
-          
+
           // Cargar últimos mensajes para cada contacto
           this.otrosMiembros.forEach(miembro => {
             this.cargarUltimosMensajes(miembro.id);
@@ -191,7 +231,7 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
           this.mensajes = resp;
           this.mensajesPorContacto[idDestinatario] = resp;
           this.cargandoMensajes = false;
-          this.scrollToBottom();
+          this.scrollToBottom(true); // Force scroll on load
           console.log('✅ Mensajes cargados:', resp.length);
         },
         error: (err) => {
@@ -241,6 +281,7 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   // Seleccionar contacto
   seleccionarContacto(contactoId: number): void {
     this.contactoSeleccionado = contactoId;
+    this.saveState();
     this.cargarMensajes(contactoId);
     this.iniciarPolling();
   }
@@ -248,6 +289,7 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   // Volver a la lista de contactos
   volverALista(): void {
     this.contactoSeleccionado = null;
+    this.saveState();
     this.mensajes = [];
     this.detenerPolling();
   }
@@ -274,17 +316,22 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (resp) => {
         // Agregar el mensaje a la lista local
-        this.mensajes.push(resp);
-        
+
+
         // Actualizar cache de mensajes por contacto
         if (!this.mensajesPorContacto[this.contactoSeleccionado!]) {
           this.mensajesPorContacto[this.contactoSeleccionado!] = [];
         }
-        this.mensajesPorContacto[this.contactoSeleccionado!].push(resp);
-        
+
+
+        // Si estamos viendo este chat, actualizar la lista visible
+        if (this.contactoSeleccionado) {
+          this.mensajes.push(resp);
+        }
+
         this.nuevoMensaje = '';
         this.enviandoMensaje = false;
-        this.scrollToBottom();
+        this.scrollToBottom(true); // Force scroll on send
         console.log('✅ Mensaje enviado:', resp);
       },
       error: (err) => {
@@ -296,10 +343,16 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   }
 
   // Scroll al final del chat
-  scrollToBottom(): void {
+  scrollToBottom(force: boolean = false): void {
     setTimeout(() => {
       if (this.chatBody) {
-        this.chatBody.nativeElement.scrollTop = this.chatBody.nativeElement.scrollHeight;
+        const element = this.chatBody.nativeElement;
+        const threshold = 150; // px from bottom
+        const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+
+        if (force || isNearBottom) {
+          element.scrollTop = element.scrollHeight;
+        }
       }
     }, 100);
   }
@@ -331,18 +384,18 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (nuevosMensajes) => {
           const mensajesActuales = this.mensajesPorContacto[this.contactoSeleccionado!] || [];
-          
+
           if (nuevosMensajes.length > mensajesActuales.length) {
             // Hay mensajes nuevos
             const cantidadNuevos = nuevosMensajes.length - mensajesActuales.length;
-            
+
             // Actualizar cache
             this.mensajesPorContacto[this.contactoSeleccionado!] = nuevosMensajes;
-            
+
             if (this.isOpen && this.contactoSeleccionado) {
               // Si el chat está abierto y es el contacto actual, actualizar mensajes
               this.mensajes = nuevosMensajes;
-              this.scrollToBottom();
+              this.scrollToBottom(); // Smart scroll handles the logic
             } else {
               // Si el chat está cerrado, incrementar notificaciones
               this.unreadMessages += cantidadNuevos;
@@ -358,13 +411,16 @@ export class ChatFloatingComponent implements OnInit, OnDestroy {
   // Toggle del chat
   toggleChat(): void {
     this.isOpen = !this.isOpen;
-    
+    this.saveState();
+
     if (this.isOpen) {
       // Al abrir el chat, reiniciar notificaciones
       this.unreadMessages = 0;
       // Iniciar polling si hay un contacto seleccionado
       if (this.contactoSeleccionado) {
         this.iniciarPolling();
+        // Ensure scroll on open
+        this.scrollToBottom(true);
       }
     } else {
       // Al cerrar el chat, detener polling

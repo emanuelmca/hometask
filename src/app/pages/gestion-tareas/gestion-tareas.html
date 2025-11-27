@@ -2,20 +2,19 @@
 <app-nav *ngIf="isAdmin"></app-nav>
 <app-nav-miembro *ngIf="!isAdmin"></app-nav-miembro>
 
-
 <div class="tasks-container">
   <div class="container">
-    
+
     <!-- HEADER -->
     <div class="tasks-header">
       <div class="row align-items-center">
         <div class="col-md-8">
           <h1>📋 Gestión de Tareas</h1>
-          <p class="text-muted">Organiza y gestiona las tareas de tu hogar</p>
+          <p>Organiza y gestiona las tareas de tu hogar de forma eficiente</p>
         </div>
         <div class="col-md-4 text-end">
           <button class="btn btn-primary" (click)="abrirModalCrearTarea()">
-            ➕ Nueva Tarea
+            <span>➕</span> Nueva Tarea
           </button>
         </div>
       </div>
@@ -23,43 +22,34 @@
 
     <!-- FILTROS Y ESTADÍSTICAS -->
     <div class="tasks-filters">
-      <div class="row">
+      <div class="row align-items-center">
         <div class="col-md-8">
           <div class="filter-buttons">
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroEstado === 'todas'"
-              (click)="filtrarTareas('todas')">
+            <button class="btn-filter" [class.active]="filtroEstado === 'todas'" (click)="filtrarTareas('todas')">
               Todas ({{ tareas.length }})
             </button>
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroEstado === 'pendiente'"
+            <button class="btn-filter" [class.active]="filtroEstado === 'pendiente'"
               (click)="filtrarTareas('pendiente')">
               Pendientes ({{ contarTareasPorEstado('pendiente') }})
             </button>
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroEstado === 'en_progreso'"
+            <button class="btn-filter" [class.active]="filtroEstado === 'en_progreso'"
               (click)="filtrarTareas('en_progreso')">
               En Progreso ({{ contarTareasPorEstado('en_progreso') }})
             </button>
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroEstado === 'completada'"
+            <button class="btn-filter" [class.active]="filtroEstado === 'completada'"
               (click)="filtrarTareas('completada')">
               Completadas ({{ contarTareasPorEstado('completada') }})
             </button>
           </div>
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-md-4">
           <div class="tasks-stats">
-            <span class="stat-item">
+            <div class="stat-item">
               📊 Total: {{ tareas.length }}
-            </span>
-            <span class="stat-item">
+            </div>
+            <div class="stat-item">
               ✅ {{ contarTareasPorEstado('completada') }} completadas
-            </span>
+            </div>
           </div>
         </div>
       </div>
@@ -68,19 +58,20 @@
     <!-- MENSAJES DE ESTADO -->
     <div *ngIf="errorMessage" class="alert alert-danger">
       {{ errorMessage }}
-      <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+      <button type="button" class="btn-close" (click)="errorMessage = ''">×</button>
     </div>
 
     <!-- LOADING -->
     <div *ngIf="loading" class="loading-container">
-      <div class="spinner-border text-primary"></div>
-      <p>Cargando tareas...</p>
+      <div class="spinner-border"></div>
+      <p style="margin-top: 15px;">Cargando tareas...</p>
     </div>
 
     <!-- LISTA DE TAREAS -->
     <div class="tasks-list" *ngIf="!loading && tareasFiltradas.length > 0">
-      <div class="task-card clickable" *ngFor="let tarea of tareasFiltradas" [class]="'estado-' + tarea.estado_actual" (click)="navegarADetalle(tarea.id)">
-        
+      <div class="task-card clickable" *ngFor="let tarea of tareasFiltradas; trackBy: trackByTarea"
+        [class]="'estado-' + tarea.estado_actual" (click)="navegarADetalle(tarea.id)">
+
         <!-- HEADER DE LA TAREA -->
         <div class="task-header">
           <div class="task-title-section">
@@ -93,7 +84,8 @@
             <button class="btn-action" (click)="editarTarea(tarea); $event.stopPropagation()" title="Editar">
               ✏️
             </button>
-            <button class="btn-action" (click)="cambiarEstadoTarea(tarea); $event.stopPropagation()" title="Cambiar estado">
+            <button class="btn-action" (click)="cambiarEstadoTarea(tarea); $event.stopPropagation()"
+              title="Cambiar estado">
               🔄
             </button>
           </div>
@@ -108,19 +100,19 @@
             <span class="detail-label">📁 Categoría:</span>
             <span class="detail-value">{{ tarea.categoria || 'Sin categoría' }}</span>
           </div>
-          
+
           <div class="task-detail">
             <span class="detail-label">👤 Asignado a:</span>
             <span class="detail-value">
               {{ obtenerNombreMiembro(tarea.asignado_a) || 'No asignado' }}
             </span>
           </div>
-          
+
           <div class="task-detail" *ngIf="tarea.fecha_limite">
             <span class="detail-label">📅 Fecha límite:</span>
             <span class="detail-value">{{ tarea.fecha_limite | date:'mediumDate' }}</span>
           </div>
-          
+
           <div class="task-detail">
             <span class="detail-label">🕐 Creado:</span>
             <span class="detail-value">{{ tarea.fecha_creacion | date:'medium' }}</span>
@@ -149,7 +141,7 @@
         Comienza creando la primera tarea para tu hogar
       </p>
       <button class="btn btn-primary" (click)="abrirModalCrearTarea()">
-        ➕ Crear Primera Tarea
+        <span>➕</span> Crear Primera Tarea
       </button>
     </div>
 
@@ -159,64 +151,43 @@
 <!-- MODAL PARA CREAR/EDITAR TAREA -->
 <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    
+
     <div class="modal-header">
       <h3>{{ editando ? '✏️ Editar Tarea' : '➕ Crear Nueva Tarea' }}</h3>
       <button class="close-btn" (click)="cerrarModal()">×</button>
     </div>
 
     <div class="modal-body">
-      
+
       <div *ngIf="errorModal" class="alert alert-danger">
         {{ errorModal }}
       </div>
 
       <form (ngSubmit)="guardarTarea()" #tareaForm="ngForm">
-        
+
         <div class="form-group">
           <label>Título *</label>
-          <input 
-            type="text" 
-            class="form-control"
-            [(ngModel)]="nuevaTarea.titulo"
-            name="titulo"
-            required
-            placeholder="Ej: Lavar los platos"
-          >
+          <input type="text" class="form-control" [(ngModel)]="nuevaTarea.titulo" name="titulo" required
+            placeholder="Ej: Lavar los platos">
         </div>
 
         <div class="form-group">
           <label>Descripción</label>
-          <textarea 
-            class="form-control"
-            [(ngModel)]="nuevaTarea.descripcion"
-            name="descripcion"
-            rows="3"
-            placeholder="Descripción detallada de la tarea..."
-          ></textarea>
+          <textarea class="form-control" [(ngModel)]="nuevaTarea.descripcion" name="descripcion" rows="3"
+            placeholder="Descripción detallada de la tarea..."></textarea>
         </div>
 
         <div class="form-group">
           <label>Categoría</label>
-          <input 
-            type="text" 
-            class="form-control"
-            [(ngModel)]="nuevaTarea.categoria"
-            name="categoria"
-            placeholder="Ej: Limpieza, Cocina, Mantenimiento..."
-          >
+          <input type="text" class="form-control" [(ngModel)]="nuevaTarea.categoria" name="categoria"
+            placeholder="Ej: Limpieza, Cocina, Mantenimiento...">
         </div>
 
         <div class="form-group">
           <label>Asignar a *</label>
-          <select 
-            class="form-control"
-            [(ngModel)]="nuevaTarea.asignado_a"
-            name="asignado_a"
-            required
-          >
+          <select class="form-control" [(ngModel)]="nuevaTarea.asignado_a" name="asignado_a" required>
             <option value="">Seleccionar miembro</option>
-            <option *ngFor="let miembro of miembros" [value]="miembro.id">
+            <option *ngFor="let miembro of miembros; trackBy: trackByMiembro" [value]="miembro.id">
               {{ miembro.nombre_completo }} ({{ miembro.rol.nombre }})
             </option>
           </select>
@@ -224,27 +195,14 @@
 
         <div class="form-group">
           <label>Fecha Límite</label>
-          <input 
-            type="date" 
-            class="form-control"
-            [(ngModel)]="nuevaTarea.fecha_limite"
-            name="fecha_limite"
-          >
+          <input type="date" class="form-control" [(ngModel)]="nuevaTarea.fecha_limite" name="fecha_limite">
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
-            class="btn btn-secondary"
-            (click)="cerrarModal()"
-          >
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
             Cancelar
           </button>
-          <button 
-            type="submit" 
-            class="btn btn-primary"
-            [disabled]="!tareaForm.form.valid || guardandoTarea"
-          >
+          <button type="submit" class="btn btn-primary" [disabled]="!tareaForm.form.valid || guardandoTarea">
             <span *ngIf="guardandoTarea" class="spinner"></span>
             {{ guardandoTarea ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear Tarea') }}
           </button>

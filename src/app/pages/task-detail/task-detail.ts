@@ -190,7 +190,7 @@ export class TaskDetailComponent implements OnInit {
 
   // Volver a la lista
   volver(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/tasks']);
   }
 
   // Calcular días hasta la fecha límite

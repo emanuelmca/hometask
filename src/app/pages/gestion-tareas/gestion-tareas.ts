@@ -86,9 +86,9 @@ export class TasksComponent implements OnInit {
 
   // Verificar rol del usuario
   verificarRol(): void {
-    const rolId = localStorage.getItem('rolId');
+    const rolId = localStorage.getItem('rol_usuario');
     // rolId 1 = Administrador, rolId 2 = Hijo/Miembro
-    this.isAdmin = rolId === '1';
+    this.isAdmin = rolId === 'Administrador' ? true : false;
   }
 
   // Headers de autenticación
@@ -344,5 +344,14 @@ export class TasksComponent implements OnInit {
   // Navegar a detalles de tarea
   navegarADetalle(id: number): void {
     this.router.navigate(['/task-detail', id]);
+  }
+
+  // TrackBy para optimizar listas
+  trackByTarea(index: number, tarea: Tarea): number {
+    return tarea.id;
+  }
+
+  trackByMiembro(index: number, miembro: Miembro): number {
+    return miembro.id;
   }
 }

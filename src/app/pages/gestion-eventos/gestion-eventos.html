@@ -2,65 +2,50 @@
 
 <div class="events-container">
   <div class="container-fluid">
-    
+
     <!-- HEADER -->
     <div class="events-header">
-      <div class="row align-items-center">
-        <div class="col-md-8">
-          <h1>📅 Gestor de Eventos</h1>
-          <p class="text-muted">Organiza y gestiona los eventos de tu hogar</p>
-        </div>
-        <div class="col-md-4 text-end">
-          <button class="btn btn-primary" (click)="abrirModalCrearEvento()">
-            ➕ Nuevo Evento
-          </button>
-        </div>
+      <div class="header-content">
+        <h1>Gestor de Eventos</h1>
+        <p>Organiza y gestiona los eventos de tu hogar</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="abrirModalCrearEvento()">
+          <span>+</span> Nuevo Evento
+        </button>
       </div>
     </div>
 
     <!-- FILTROS Y ESTADÍSTICAS -->
     <div class="events-filters">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="filter-buttons">
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroVista === 'calendario'"
-              (click)="cambiarVista('calendario')"
-            >
-              📅 Calendario
-            </button>
-            <button 
-              class="btn-filter" 
-              [class.active]="filtroVista === 'lista'"
-              (click)="cambiarVista('lista')"
-            >
-              📋 Lista
-            </button>
-          </div>
+      <div class="filter-buttons">
+        <button class="btn-filter" [class.active]="filtroVista === 'calendario'" (click)="cambiarVista('calendario')">
+          📅 Calendario
+        </button>
+        <button class="btn-filter" [class.active]="filtroVista === 'lista'" (click)="cambiarVista('lista')">
+          📋 Lista
+        </button>
+      </div>
+
+      <div class="events-stats">
+        <div class="stat-item">
+          Total: <strong>{{ eventos.length }}</strong>
         </div>
-        <div class="col-md-6 text-end">
-          <div class="events-stats">
-            <span class="stat-item">
-              📊 Total: {{ eventos.length }}
-            </span>
-            <span class="stat-item">
-              🗓️ Este mes: {{ eventosEsteMes.length }}
-            </span>
-          </div>
+        <div class="stat-item">
+          Este mes: <strong>{{ eventosEsteMes.length }}</strong>
         </div>
       </div>
     </div>
 
     <!-- MENSAJES DE ESTADO -->
-    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible">
+    <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show">
       {{ errorMessage }}
       <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
     </div>
 
     <!-- LOADING -->
     <div *ngIf="loading" class="loading-container">
-      <div class="spinner-border text-primary"></div>
+      <div class="spinner"></div>
       <p>Cargando eventos...</p>
     </div>
 
@@ -73,7 +58,7 @@
 
     <!-- VISTA LISTA -->
     <div class="list-view" *ngIf="!loading && filtroVista === 'lista'">
-      
+
       <!-- Filtros de fecha -->
       <div class="date-filters">
         <div class="filter-group">
@@ -100,8 +85,9 @@
 
       <!-- LISTA DE EVENTOS -->
       <div class="events-list">
-        <div class="event-card" *ngFor="let evento of eventosFiltrados" [class.pasado]="esEventoPasado(evento)">
-          
+        <div class="event-card" *ngFor="let evento of eventosFiltrados; trackBy: trackByEvento"
+          [class.pasado]="esEventoPasado(evento)">
+
           <!-- HEADER DEL EVENTO -->
           <div class="event-header">
             <div class="event-title-section">
@@ -118,14 +104,7 @@
                 </span>
               </div>
             </div>
-            <div class="event-actions">
-              <button class="btn-action" (click)="editarEvento(evento)" title="Editar">
-                ✏️
-              </button>
-              <button class="btn-action btn-danger" (click)="eliminarEvento(evento)" title="Eliminar">
-                🗑️
-              </button>
-            </div>
+
           </div>
 
           <!-- DESCRIPCIÓN -->
@@ -143,15 +122,19 @@
                 {{ obtenerNombreCreador(evento.creado_por) }}
               </span>
             </div>
-            <div class="event-detail">
-              <span class="detail-label">📅 Creado:</span>
-              <span class="detail-value">{{ obtenerFechaCreacion(evento.id) | date:'medium' }}</span>
+            <div class="event-actions">
+              <button class="btn-action" (click)="editarEvento(evento)" title="Editar">
+                ✏️
+              </button>
+              <button class="btn-action btn-danger" (click)="eliminarEvento(evento)" title="Eliminar">
+                🗑️
+              </button>
             </div>
           </div>
 
           <!-- ETIQUETA DE EVENTO PASADO -->
           <div class="event-past-badge" *ngIf="esEventoPasado(evento)">
-            ⏳ Evento pasado
+            ⏳ Finalizado
           </div>
 
         </div>
@@ -167,7 +150,7 @@
         <p *ngIf="filtroFecha === 'todos'">
           Comienza creando el primer evento para tu hogar
         </p>
-        <button class="btn btn-primary" (click)="abrirModalCrearEvento()">
+        <button class="btn btn-primary" (click)="abrirModalCrearEvento()" style="max-width: 200px; margin: 20px auto;">
           ➕ Crear Primer Evento
         </button>
       </div>
@@ -180,79 +163,52 @@
 <!-- MODAL PARA CREAR/EDITAR EVENTO -->
 <div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    
+
     <div class="modal-header">
       <h3>{{ editando ? '✏️ Editar Evento' : '➕ Crear Nuevo Evento' }}</h3>
       <button class="close-btn" (click)="cerrarModal()">×</button>
     </div>
 
     <div class="modal-body">
-      
+
       <div *ngIf="errorModal" class="alert alert-danger">
         {{ errorModal }}
       </div>
 
       <form (ngSubmit)="guardarEvento()" #eventoForm="ngForm">
-        
+
         <div class="form-group">
           <label>Título del Evento *</label>
-          <input 
-            type="text" 
-            class="form-control"
-            [(ngModel)]="nuevoEvento.titulo"
-            name="titulo"
-            required
-            placeholder="Ej: Reunión familiar, Cumpleaños, etc."
-          >
+          <input type="text" class="form-control" [(ngModel)]="nuevoEvento.titulo" name="titulo" required
+            placeholder="Ej: Reunión familiar, Cumpleaños, etc.">
         </div>
 
         <div class="form-group">
           <label>Descripción</label>
-          <textarea 
-            class="form-control"
-            [(ngModel)]="nuevoEvento.descripcion"
-            name="descripcion"
-            rows="3"
-            placeholder="Descripción detallada del evento..."
-          ></textarea>
+          <textarea class="form-control" [(ngModel)]="nuevoEvento.descripcion" name="descripcion" rows="3"
+            placeholder="Descripción detallada del evento..."></textarea>
         </div>
 
-        <div class="row">
-          <div class="col-md-6">
+        <div class="row" style="display: flex; gap: 20px;">
+          <div class="col-md-6" style="flex: 1;">
             <div class="form-group">
               <label>Fecha *</label>
-              <input 
-                type="date" 
-                class="form-control"
-                [(ngModel)]="nuevoEvento.fecha"
-                name="fecha"
-                required
-                (change)="actualizarFechaHora()"
-              >
+              <input type="date" class="form-control" [(ngModel)]="nuevoEvento.fecha" name="fecha" required
+                (change)="actualizarFechaHora()">
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6" style="flex: 1;">
             <div class="form-group">
               <label>Hora *</label>
-              <input 
-                type="time" 
-                class="form-control"
-                [(ngModel)]="nuevoEvento.hora"
-                name="hora"
-                required
-                (change)="actualizarFechaHora()"
-              >
+              <input type="time" class="form-control" [(ngModel)]="nuevoEvento.hora" name="hora" required
+                (change)="actualizarFechaHora()">
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Duración (minutos)</label>
-          <select 
-            class="form-control"
-            [(ngModel)]="nuevoEvento.duracion_min"
-            name="duracion_min"
-          >
+          <label>Duración</label>
+          <select class="form-control" [(ngModel)]="nuevoEvento.duracion_min" name="duracion_min">
             <option value="30">30 minutos</option>
             <option value="60" selected>1 hora</option>
             <option value="90">1.5 horas</option>
@@ -263,18 +219,10 @@
         </div>
 
         <div class="form-actions">
-          <button 
-            type="button" 
-            class="btn btn-secondary"
-            (click)="cerrarModal()"
-          >
+          <button type="button" class="btn btn-secondary" (click)="cerrarModal()">
             Cancelar
           </button>
-          <button 
-            type="submit" 
-            class="btn btn-primary"
-            [disabled]="!eventoForm.form.valid || guardandoEvento"
-          >
+          <button type="submit" class="btn btn-primary" [disabled]="!eventoForm.form.valid || guardandoEvento">
             <span *ngIf="guardandoEvento" class="spinner"></span>
             {{ guardandoEvento ? 'Guardando...' : (editando ? 'Actualizar' : 'Crear Evento') }}
           </button>

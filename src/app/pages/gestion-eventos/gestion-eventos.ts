@@ -30,21 +30,21 @@ export class EventsComponent implements OnInit {
   // Datos
   eventos: Evento[] = [];
   eventosFiltrados: Evento[] = [];
-  
+
   // Estados
   loading = false;
   errorMessage = '';
   filtroVista = 'calendario'; // 'calendario' | 'lista'
   filtroFecha = 'todos';
   orden = 'fecha_asc';
-  
+
   // Modal
   mostrarModal = false;
   editando = false;
   guardandoEvento = false;
   errorModal = '';
   eventoEditando: Evento | null = null;
-  
+
   // Nuevo evento
   nuevoEvento = {
     titulo: '',
@@ -61,7 +61,7 @@ export class EventsComponent implements OnInit {
   private idHogar = localStorage.getItem('id_hogar');
   private idMiembro = localStorage.getItem('id_miembro');
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.cargarEventos();
@@ -120,7 +120,7 @@ export class EventsComponent implements OnInit {
       const ahora = new Date();
       eventosFiltrados = eventosFiltrados.filter(evento => {
         const fechaEvento = new Date(evento.fecha_hora);
-        
+
         switch (this.filtroFecha) {
           case 'hoy':
             return this.esMismoDia(fechaEvento, ahora);
@@ -142,7 +142,7 @@ export class EventsComponent implements OnInit {
     eventosFiltrados.sort((a, b) => {
       const fechaA = new Date(a.fecha_hora);
       const fechaB = new Date(b.fecha_hora);
-      
+
       switch (this.orden) {
         case 'fecha_asc':
           return fechaA.getTime() - fechaB.getTime();
@@ -169,23 +169,23 @@ export class EventsComponent implements OnInit {
     const inicioSemana = new Date(fecha2);
     inicioSemana.setDate(fecha2.getDate() - fecha2.getDay());
     inicioSemana.setHours(0, 0, 0, 0);
-    
+
     const finSemana = new Date(inicioSemana);
     finSemana.setDate(inicioSemana.getDate() + 6);
     finSemana.setHours(23, 59, 59, 999);
-    
+
     return fecha1 >= inicioSemana && fecha1 <= finSemana;
   }
 
   private esMismoMes(fecha1: Date, fecha2: Date): boolean {
-    return fecha1.getMonth() === fecha2.getMonth() && 
-           fecha1.getFullYear() === fecha2.getFullYear();
+    return fecha1.getMonth() === fecha2.getMonth() &&
+      fecha1.getFullYear() === fecha2.getFullYear();
   }
 
   // Obtener eventos de este mes
   get eventosEsteMes(): Evento[] {
     const ahora = new Date();
-    return this.eventos.filter(evento => 
+    return this.eventos.filter(evento =>
       this.esMismoMes(new Date(evento.fecha_hora), ahora)
     );
   }
@@ -224,11 +224,11 @@ export class EventsComponent implements OnInit {
   abrirModalCrearEvento(): void {
     this.editando = false;
     this.eventoEditando = null;
-    
+
     // Establecer fecha y hora por defecto (mañana a las 10:00)
     const manana = new Date();
     manana.setDate(manana.getDate() + 1);
-    
+
     this.nuevoEvento = {
       titulo: '',
       descripcion: '',
@@ -239,7 +239,7 @@ export class EventsComponent implements OnInit {
       id_hogar: parseInt(this.idHogar || '0'),
       creado_por: parseInt(this.idMiembro || '0')
     };
-    
+
     this.actualizarFechaHora();
     this.errorModal = '';
     this.mostrarModal = true;
@@ -249,9 +249,9 @@ export class EventsComponent implements OnInit {
   editarEvento(evento: Evento): void {
     this.editando = true;
     this.eventoEditando = evento;
-    
+
     const fechaHora = new Date(evento.fecha_hora);
-    
+
     this.nuevoEvento = {
       titulo: evento.titulo,
       descripcion: evento.descripcion,
@@ -262,7 +262,7 @@ export class EventsComponent implements OnInit {
       id_hogar: evento.id_hogar,
       creado_por: evento.creado_por
     };
-    
+
     this.errorModal = '';
     this.mostrarModal = true;
   }
@@ -361,21 +361,21 @@ export class EventsComponent implements OnInit {
   private manejarErrorGuardado(err: any): void {
     console.error('❌ Error guardando evento:', err);
     this.guardandoEvento = false;
-    
+
     let mensaje = 'Error al guardar el evento';
     if (err.status === 400) {
       mensaje = 'Datos inválidos';
     } else if (err.status === 401) {
       mensaje = 'No autorizado';
     }
-    
+
     this.errorModal = mensaje;
   }
 
   // Eliminar evento
   eliminarEvento(evento: Evento): void {
     const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el evento "${evento.titulo}"?`);
-    
+
     if (!confirmacion) return;
 
     const headers = this.buildAuthHeaders();
@@ -396,5 +396,10 @@ export class EventsComponent implements OnInit {
           alert('❌ Error al eliminar el evento');
         }
       });
+  }
+
+  // TrackBy function
+  trackByEvento(index: number, evento: Evento): number {
+    return evento.id;
   }
 }
